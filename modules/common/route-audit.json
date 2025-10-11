@@ -1,0 +1,862 @@
+{
+  "summary": {
+    "totalRoutes": 89,
+    "publicRoutes": 8,
+    "adminRoutes": 81,
+    "routersAnalyzed": [
+      "cms",
+      "team",
+      "media-positions",
+      "videos",
+      "navigation",
+      "auth",
+      "users",
+      "media",
+      "main-routes"
+    ]
+  },
+  "cms": {
+    "mountedAt": ["/api/v1", "/api/v1/admin"],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/public/pages",
+        "currentFullPath": "/api/v1/public/pages",
+        "hasAuth": false,
+        "classification": "PUBLIC",
+        "recommendedPath": "/api/v1/public/pages",
+        "notes": "Already public - gets all published pages"
+      },
+      {
+        "method": "GET",
+        "path": "/public/pages/:pageId/nodes",
+        "currentFullPath": "/api/v1/public/pages/:pageId/nodes",
+        "hasAuth": false,
+        "classification": "PUBLIC",
+        "recommendedPath": "/api/v1/public/pages/:pageId/nodes",
+        "notes": "Already public - gets published page content nodes"
+      },
+      {
+        "method": "GET",
+        "path": "/pages",
+        "currentFullPath": "/api/v1/admin/pages",
+        "hasAuth": true,
+        "permissions": ["pages:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/pages",
+        "notes": "Admin only - gets all pages including unpublished"
+      },
+      {
+        "method": "GET",
+        "path": "/pages/:id",
+        "currentFullPath": "/api/v1/admin/pages/:id",
+        "hasAuth": true,
+        "permissions": ["pages:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/pages/:id",
+        "notes": "Admin only - gets specific page details"
+      },
+      {
+        "method": "POST",
+        "path": "/pages",
+        "currentFullPath": "/api/v1/admin/pages",
+        "hasAuth": true,
+        "permissions": ["pages:create"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/pages",
+        "notes": "Admin only - creates new page"
+      },
+      {
+        "method": "PUT",
+        "path": "/pages/:id",
+        "currentFullPath": "/api/v1/admin/pages/:id",
+        "hasAuth": true,
+        "permissions": ["pages:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/pages/:id",
+        "notes": "Admin only - updates page"
+      },
+      {
+        "method": "DELETE",
+        "path": "/pages/:id",
+        "currentFullPath": "/api/v1/admin/pages/:id",
+        "hasAuth": true,
+        "permissions": ["pages:delete"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/pages/:id",
+        "notes": "Admin only - deletes page"
+      },
+      {
+        "method": "PATCH",
+        "path": "/pages/:id/publish",
+        "currentFullPath": "/api/v1/admin/pages/:id/publish",
+        "hasAuth": true,
+        "permissions": ["pages:publish"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/pages/:id/publish",
+        "notes": "Admin only - publishes/unpublishes page"
+      },
+      {
+        "method": "GET",
+        "path": "/pages/:pageId/nodes",
+        "currentFullPath": "/api/v1/admin/pages/:pageId/nodes",
+        "hasAuth": true,
+        "permissions": ["content:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/pages/:pageId/nodes",
+        "notes": "Admin only - gets all nodes including unpublished"
+      },
+      {
+        "method": "POST",
+        "path": "/nodes",
+        "currentFullPath": "/api/v1/admin/nodes",
+        "hasAuth": true,
+        "permissions": ["content:create"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/nodes",
+        "notes": "Admin only - creates content node"
+      },
+      {
+        "method": "GET",
+        "path": "/nodes/:id",
+        "currentFullPath": "/api/v1/admin/nodes/:id",
+        "hasAuth": true,
+        "permissions": ["content:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/nodes/:id",
+        "notes": "Admin only - gets specific node"
+      },
+      {
+        "method": "PUT",
+        "path": "/nodes/:id",
+        "currentFullPath": "/api/v1/admin/nodes/:id",
+        "hasAuth": true,
+        "permissions": ["content:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/nodes/:id",
+        "notes": "Admin only - updates node"
+      },
+      {
+        "method": "DELETE",
+        "path": "/nodes/:id",
+        "currentFullPath": "/api/v1/admin/nodes/:id",
+        "hasAuth": true,
+        "permissions": ["content:delete"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/nodes/:id",
+        "notes": "Admin only - deletes node"
+      },
+      {
+        "method": "PATCH",
+        "path": "/pages/:pageId/nodes/reorder",
+        "currentFullPath": "/api/v1/admin/pages/:pageId/nodes/reorder",
+        "hasAuth": true,
+        "permissions": ["content:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/pages/:pageId/nodes/reorder",
+        "notes": "Admin only - reorders nodes"
+      },
+      {
+        "method": "GET",
+        "path": "/pages/:pageId/sections",
+        "currentFullPath": "/api/v1/admin/pages/:pageId/sections",
+        "hasAuth": true,
+        "permissions": ["content:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/pages/:pageId/sections",
+        "notes": "Admin only - gets page sections"
+      },
+      {
+        "method": "POST",
+        "path": "/sections",
+        "currentFullPath": "/api/v1/admin/sections",
+        "hasAuth": true,
+        "permissions": ["content:create"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/sections",
+        "notes": "Admin only - creates section"
+      },
+      {
+        "method": "PUT",
+        "path": "/sections/:id",
+        "currentFullPath": "/api/v1/admin/sections/:id",
+        "hasAuth": true,
+        "permissions": ["content:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/sections/:id",
+        "notes": "Admin only - updates section"
+      },
+      {
+        "method": "DELETE",
+        "path": "/sections/:id",
+        "currentFullPath": "/api/v1/admin/sections/:id",
+        "hasAuth": true,
+        "permissions": ["content:delete"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/sections/:id",
+        "notes": "Admin only - deletes section"
+      },
+      {
+        "method": "PATCH",
+        "path": "/pages/:pageId/sections/reorder",
+        "currentFullPath": "/api/v1/admin/pages/:pageId/sections/reorder",
+        "hasAuth": true,
+        "permissions": ["content:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/pages/:pageId/sections/reorder",
+        "notes": "Admin only - reorders sections"
+      },
+      {
+        "method": "GET",
+        "path": "/sections/:sectionId/blocks",
+        "currentFullPath": "/api/v1/admin/sections/:sectionId/blocks",
+        "hasAuth": true,
+        "permissions": ["content:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/sections/:sectionId/blocks",
+        "notes": "Admin only - gets section blocks"
+      },
+      {
+        "method": "POST",
+        "path": "/blocks",
+        "currentFullPath": "/api/v1/admin/blocks",
+        "hasAuth": true,
+        "permissions": ["content:create"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/blocks",
+        "notes": "Admin only - creates block"
+      },
+      {
+        "method": "PUT",
+        "path": "/blocks/:id",
+        "currentFullPath": "/api/v1/admin/blocks/:id",
+        "hasAuth": true,
+        "permissions": ["content:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/blocks/:id",
+        "notes": "Admin only - updates block"
+      },
+      {
+        "method": "DELETE",
+        "path": "/blocks/:id",
+        "currentFullPath": "/api/v1/admin/blocks/:id",
+        "hasAuth": true,
+        "permissions": ["content:delete"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/blocks/:id",
+        "notes": "Admin only - deletes block"
+      },
+      {
+        "method": "PATCH",
+        "path": "/sections/:sectionId/blocks/reorder",
+        "currentFullPath": "/api/v1/admin/sections/:sectionId/blocks/reorder",
+        "hasAuth": true,
+        "permissions": ["content:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/sections/:sectionId/blocks/reorder",
+        "notes": "Admin only - reorders blocks"
+      }
+    ]
+  },
+  "team": {
+    "mountedAt": ["/api/v1/team", "/api/v1/admin/team"],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/public/team",
+        "currentFullPath": "/api/v1/team/public/team",
+        "hasAuth": false,
+        "classification": "PUBLIC",
+        "recommendedPath": "/api/v1/public/team",
+        "notes": "Already public - gets visible team members"
+      },
+      {
+        "method": "GET",
+        "path": "/",
+        "currentFullPath": "/api/v1/admin/team",
+        "hasAuth": true,
+        "permissions": ["content:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/team",
+        "notes": "Admin only - gets all team members"
+      },
+      {
+        "method": "GET",
+        "path": "/:id",
+        "currentFullPath": "/api/v1/admin/team/:id",
+        "hasAuth": true,
+        "permissions": ["content:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/team/:id",
+        "notes": "Admin only - gets specific team member"
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "currentFullPath": "/api/v1/admin/team",
+        "hasAuth": true,
+        "permissions": ["content:create"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/team",
+        "notes": "Admin only - creates team member"
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "currentFullPath": "/api/v1/admin/team/:id",
+        "hasAuth": true,
+        "permissions": ["content:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/team/:id",
+        "notes": "Admin only - updates team member"
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "currentFullPath": "/api/v1/admin/team/:id",
+        "hasAuth": true,
+        "permissions": ["content:delete"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/team/:id",
+        "notes": "Admin only - deletes team member"
+      }
+    ]
+  },
+  "media-positions": {
+    "mountedAt": ["/api/v1/media-positions", "/api/v1/admin/media-positions"],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/public/positions",
+        "currentFullPath": "/api/v1/media-positions/public/positions",
+        "hasAuth": false,
+        "classification": "PUBLIC",
+        "recommendedPath": "/api/v1/public/media-positions",
+        "notes": "Already public - gets active media positions"
+      },
+      {
+        "method": "GET",
+        "path": "/public/position/:key",
+        "currentFullPath": "/api/v1/media-positions/public/position/:key",
+        "hasAuth": false,
+        "classification": "PUBLIC",
+        "recommendedPath": "/api/v1/public/media-positions/:key",
+        "notes": "Already public - gets media position by key"
+      },
+      {
+        "method": "GET",
+        "path": "/",
+        "currentFullPath": "/api/v1/admin/media-positions",
+        "hasAuth": true,
+        "permissions": ["content:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/media-positions",
+        "notes": "Admin only - gets all media positions with optional category filter"
+      },
+      {
+        "method": "GET",
+        "path": "/:id",
+        "currentFullPath": "/api/v1/admin/media-positions/:id",
+        "hasAuth": true,
+        "permissions": ["content:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/media-positions/:id",
+        "notes": "Admin only - gets specific media position"
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "currentFullPath": "/api/v1/admin/media-positions",
+        "hasAuth": true,
+        "permissions": ["content:create"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/media-positions",
+        "notes": "Admin only - creates media position"
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "currentFullPath": "/api/v1/admin/media-positions/:id",
+        "hasAuth": true,
+        "permissions": ["content:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/media-positions/:id",
+        "notes": "Admin only - updates media position"
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "currentFullPath": "/api/v1/admin/media-positions/:id",
+        "hasAuth": true,
+        "permissions": ["content:delete"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/media-positions/:id",
+        "notes": "Admin only - deletes media position"
+      }
+    ]
+  },
+  "videos": {
+    "mountedAt": ["/api/v1/videos", "/api/v1/admin/videos"],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/public/videos",
+        "currentFullPath": "/api/v1/videos/public/videos",
+        "hasAuth": false,
+        "classification": "PUBLIC",
+        "recommendedPath": "/api/v1/public/videos",
+        "notes": "Already public - gets published videos"
+      },
+      {
+        "method": "POST",
+        "path": "/public/:id/view",
+        "currentFullPath": "/api/v1/videos/public/:id/view",
+        "hasAuth": false,
+        "classification": "PUBLIC",
+        "recommendedPath": "/api/v1/public/videos/:id/view",
+        "notes": "Already public - increments video views"
+      },
+      {
+        "method": "GET",
+        "path": "/",
+        "currentFullPath": "/api/v1/admin/videos",
+        "hasAuth": true,
+        "permissions": ["content:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/videos",
+        "notes": "Admin only - gets all videos"
+      },
+      {
+        "method": "GET",
+        "path": "/:id",
+        "currentFullPath": "/api/v1/admin/videos/:id",
+        "hasAuth": true,
+        "permissions": ["content:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/videos/:id",
+        "notes": "Admin only - gets specific video"
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "currentFullPath": "/api/v1/admin/videos",
+        "hasAuth": true,
+        "permissions": ["content:create"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/videos",
+        "notes": "Admin only - creates video"
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "currentFullPath": "/api/v1/admin/videos/:id",
+        "hasAuth": true,
+        "permissions": ["content:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/videos/:id",
+        "notes": "Admin only - updates video"
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "currentFullPath": "/api/v1/admin/videos/:id",
+        "hasAuth": true,
+        "permissions": ["content:delete"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/videos/:id",
+        "notes": "Admin only - deletes video"
+      }
+    ]
+  },
+  "navigation": {
+    "mountedAt": ["/api/v1/admin/navigation"],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "currentFullPath": "/api/v1/admin/navigation",
+        "hasAuth": true,
+        "permissions": ["navigation:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/navigation",
+        "notes": "Admin only - gets all navigation items"
+      },
+      {
+        "method": "GET",
+        "path": "/tree",
+        "currentFullPath": "/api/v1/admin/navigation/tree",
+        "hasAuth": true,
+        "permissions": ["navigation:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/navigation/tree",
+        "notes": "Admin only - gets navigation tree"
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "currentFullPath": "/api/v1/admin/navigation",
+        "hasAuth": true,
+        "permissions": ["navigation:create"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/navigation",
+        "notes": "Admin only - creates navigation item"
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "currentFullPath": "/api/v1/admin/navigation/:id",
+        "hasAuth": true,
+        "permissions": ["navigation:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/navigation/:id",
+        "notes": "Admin only - updates navigation item"
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "currentFullPath": "/api/v1/admin/navigation/:id",
+        "hasAuth": true,
+        "permissions": ["navigation:delete"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/navigation/:id",
+        "notes": "Admin only - deletes navigation item"
+      },
+      {
+        "method": "PATCH",
+        "path": "/reorder",
+        "currentFullPath": "/api/v1/admin/navigation/reorder",
+        "hasAuth": true,
+        "permissions": ["navigation:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/navigation/reorder",
+        "notes": "Admin only - reorders navigation items"
+      }
+    ]
+  },
+  "auth": {
+    "mountedAt": ["/api/v1/admin"],
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/login",
+        "currentFullPath": "/api/v1/admin/login",
+        "hasAuth": false,
+        "classification": "PUBLIC",
+        "recommendedPath": "/api/v1/auth/login",
+        "notes": "Public - admin login endpoint, should be under /api/v1/auth"
+      },
+      {
+        "method": "POST",
+        "path": "/refresh",
+        "currentFullPath": "/api/v1/admin/refresh",
+        "hasAuth": false,
+        "classification": "PUBLIC",
+        "recommendedPath": "/api/v1/auth/refresh",
+        "notes": "Public - token refresh endpoint, should be under /api/v1/auth"
+      },
+      {
+        "method": "POST",
+        "path": "/logout",
+        "currentFullPath": "/api/v1/admin/logout",
+        "hasAuth": false,
+        "classification": "PUBLIC",
+        "recommendedPath": "/api/v1/auth/logout",
+        "notes": "Public - logout endpoint, should be under /api/v1/auth"
+      },
+      {
+        "method": "GET",
+        "path": "/me",
+        "currentFullPath": "/api/v1/admin/me",
+        "hasAuth": true,
+        "permissions": [],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/auth/me",
+        "notes": "Authenticated - get current user, should be under /api/v1/auth"
+      }
+    ]
+  },
+  "users": {
+    "mountedAt": ["/api/v1/admin/users"],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "currentFullPath": "/api/v1/admin/users",
+        "hasAuth": true,
+        "permissions": ["users:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/users",
+        "notes": "Admin only - gets all users"
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "currentFullPath": "/api/v1/admin/users",
+        "hasAuth": true,
+        "permissions": ["users:create"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/users",
+        "notes": "Admin only - creates user"
+      },
+      {
+        "method": "GET",
+        "path": "/roles",
+        "currentFullPath": "/api/v1/admin/users/roles",
+        "hasAuth": true,
+        "permissions": ["users:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/users/roles",
+        "notes": "Admin only - gets all roles"
+      },
+      {
+        "method": "POST",
+        "path": "/roles",
+        "currentFullPath": "/api/v1/admin/users/roles",
+        "hasAuth": true,
+        "permissions": ["users:create"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/users/roles",
+        "notes": "Admin only - creates role"
+      },
+      {
+        "method": "POST",
+        "path": "/:userId/roles",
+        "currentFullPath": "/api/v1/admin/users/:userId/roles",
+        "hasAuth": true,
+        "permissions": ["users:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/users/:userId/roles",
+        "notes": "Admin only - assigns role to user"
+      },
+      {
+        "method": "PATCH",
+        "path": "/:userId/password",
+        "currentFullPath": "/api/v1/admin/users/:userId/password",
+        "hasAuth": true,
+        "permissions": ["users:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/users/:userId/password",
+        "notes": "Admin only - updates user password"
+      }
+    ]
+  },
+  "media": {
+    "mountedAt": ["/api/v1/admin/media"],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "currentFullPath": "/api/v1/admin/media",
+        "hasAuth": true,
+        "permissions": ["media:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/media",
+        "notes": "Admin only - gets all media assets"
+      },
+      {
+        "method": "GET",
+        "path": "/:id",
+        "currentFullPath": "/api/v1/admin/media/:id",
+        "hasAuth": true,
+        "permissions": ["media:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/media/:id",
+        "notes": "Admin only - gets specific media asset"
+      },
+      {
+        "method": "POST",
+        "path": "/",
+        "currentFullPath": "/api/v1/admin/media",
+        "hasAuth": true,
+        "permissions": ["media:create"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/media",
+        "notes": "Admin only - uploads media file"
+      },
+      {
+        "method": "PUT",
+        "path": "/:id",
+        "currentFullPath": "/api/v1/admin/media/:id",
+        "hasAuth": true,
+        "permissions": ["media:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/media/:id",
+        "notes": "Admin only - updates media metadata"
+      },
+      {
+        "method": "DELETE",
+        "path": "/:id",
+        "currentFullPath": "/api/v1/admin/media/:id",
+        "hasAuth": true,
+        "permissions": ["media:delete"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/media/:id",
+        "notes": "Admin only - deletes media asset"
+      }
+    ]
+  },
+  "main-routes": {
+    "mountedAt": ["direct in server/routes.ts"],
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/contact",
+        "currentFullPath": "/api/v1/contact",
+        "hasAuth": false,
+        "classification": "PUBLIC",
+        "recommendedPath": "/api/v1/public/contact",
+        "notes": "Public - contact form submission"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/contacts",
+        "currentFullPath": "/api/v1/admin/contacts",
+        "hasAuth": true,
+        "permissions": ["content:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/contacts",
+        "notes": "Admin only - gets all contact submissions"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/audit-logs",
+        "currentFullPath": "/api/v1/admin/audit-logs",
+        "hasAuth": true,
+        "permissions": ["users:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/audit-logs",
+        "notes": "Admin only - gets audit logs"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/themes",
+        "currentFullPath": "/api/v1/admin/themes",
+        "hasAuth": true,
+        "permissions": ["themes:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/themes",
+        "notes": "Admin only - gets all themes"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/themes/active",
+        "currentFullPath": "/api/v1/admin/themes/active",
+        "hasAuth": true,
+        "permissions": ["themes:read"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/themes/active",
+        "notes": "Admin only - gets active theme"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/themes",
+        "currentFullPath": "/api/v1/admin/themes",
+        "hasAuth": true,
+        "permissions": ["themes:create"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/themes",
+        "notes": "Admin only - creates theme"
+      },
+      {
+        "method": "PUT",
+        "path": "/admin/themes/:id",
+        "currentFullPath": "/api/v1/admin/themes/:id",
+        "hasAuth": true,
+        "permissions": ["themes:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/themes/:id",
+        "notes": "Admin only - updates theme"
+      },
+      {
+        "method": "DELETE",
+        "path": "/admin/themes/:id",
+        "currentFullPath": "/api/v1/admin/themes/:id",
+        "hasAuth": true,
+        "permissions": ["themes:delete"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/themes/:id",
+        "notes": "Admin only - deletes theme"
+      },
+      {
+        "method": "PATCH",
+        "path": "/admin/themes/:id/activate",
+        "currentFullPath": "/api/v1/admin/themes/:id/activate",
+        "hasAuth": true,
+        "permissions": ["themes:update"],
+        "classification": "ADMIN",
+        "recommendedPath": "/api/v1/admin/themes/:id/activate",
+        "notes": "Admin only - activates theme"
+      }
+    ]
+  },
+  "recommendations": {
+    "pathStructureIssues": [
+      {
+        "issue": "Auth routes mounted under /api/v1/admin",
+        "recommendation": "Move auth router to /api/v1/auth for clearer separation",
+        "affectedRoutes": [
+          "/api/v1/admin/login",
+          "/api/v1/admin/refresh",
+          "/api/v1/admin/logout",
+          "/api/v1/admin/me"
+        ]
+      },
+      {
+        "issue": "CMS router mounted on both /api/v1 and /api/v1/admin",
+        "recommendation": "Mount only on /api/v1, handle public/admin differentiation within routes",
+        "affectedRoutes": "All CMS routes"
+      },
+      {
+        "issue": "Public routes nested under module paths",
+        "recommendation": "Consider creating a dedicated /api/v1/public router",
+        "affectedRoutes": [
+          "/api/v1/team/public/team",
+          "/api/v1/media-positions/public/positions",
+          "/api/v1/media-positions/public/position/:key",
+          "/api/v1/videos/public/videos",
+          "/api/v1/videos/public/:id/view"
+        ]
+      },
+      {
+        "issue": "Contact route not following naming convention",
+        "recommendation": "Move to /api/v1/public/contact for consistency",
+        "affectedRoutes": ["/api/v1/contact"]
+      }
+    ],
+    "securityConsiderations": [
+      {
+        "note": "All admin routes properly protected with authenticateToken and requirePermission middlewares"
+      },
+      {
+        "note": "Public routes correctly expose only published/visible content"
+      },
+      {
+        "note": "Auth endpoints (login, refresh, logout) are public as expected"
+      },
+      {
+        "note": "View increment endpoint is public (rate limiting may be needed)"
+      }
+    ],
+    "proposedRouteStructure": {
+      "/api/v1/auth": [
+        "POST /login",
+        "POST /refresh",
+        "POST /logout",
+        "GET /me (authenticated)"
+      ],
+      "/api/v1/public": [
+        "GET /pages",
+        "GET /pages/:pageId/nodes",
+        "GET /team",
+        "GET /media-positions",
+        "GET /media-positions/:key",
+        "GET /videos",
+        "POST /videos/:id/view",
+        "POST /contact"
+      ],
+      "/api/v1/admin": [
+        "All authenticated admin endpoints organized by module"
+      ]
+    }
+  }
+}
