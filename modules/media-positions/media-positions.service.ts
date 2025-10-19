@@ -1,27 +1,27 @@
-import { mediaRepository, systemRepository } from "../../repositories/implementations";
+import { storage } from "../../storage";
 import type { InsertMediaPosition, MediaPosition } from "@myhealthintegral/shared";
 import { notFound } from "../common/errorHandlers";
 
 export const mediaPositionsService = {
   async getAllMediaPositions(): Promise<MediaPosition[]> {
-    return await mediaRepository.getAllMediaPositions();
+    return await storage.getAllMediaPositions();
   },
 
   async getActiveMediaPositions(): Promise<MediaPosition[]> {
-    return await mediaRepository.getPublicMediaPositions();
+    return await storage.getPublicMediaPositions();
   },
 
   async getMediaPositionsByCategory(category: string): Promise<MediaPosition[]> {
-    const allPositions = await mediaRepository.getAllMediaPositions();
+    const allPositions = await storage.getAllMediaPositions();
     return allPositions.filter(p => p.category === category);
   },
 
   async getMediaPosition(id: string): Promise<MediaPosition | undefined> {
-    return await mediaRepository.findMediaPositionById(id) || undefined;
+    return await storage.getMediaPosition(id) || undefined;
   },
 
   async getMediaPositionByKey(key: string): Promise<MediaPosition | undefined> {
-    return await mediaRepository.findMediaPositionByKey(key) || undefined;
+    return await storage.getMediaPositionByKey(key) || undefined;
   },
 
   async createMediaPosition(
@@ -29,9 +29,9 @@ export const mediaPositionsService = {
     userId: string,
     req: any
   ): Promise<MediaPosition> {
-    const position = await mediaRepository.createMediaPosition(data);
+    const position = await storage.createMediaPosition(data);
 
-    await systemRepository.createAuditLog({
+    await storage.createAuditLog({
       userId,
       action: "create",
       resource: "media_positions",
@@ -54,9 +54,9 @@ export const mediaPositionsService = {
     userId: string,
     req: any
   ): Promise<MediaPosition> {
-    const position = await mediaRepository.updateMediaPosition(id, updates);
+    const position = await storage.updateMediaPosition(id, updates);
 
-    await systemRepository.createAuditLog({
+    await storage.createAuditLog({
       userId,
       action: "update",
       resource: "media_positions",
@@ -74,15 +74,15 @@ export const mediaPositionsService = {
   },
 
   async deleteMediaPosition(id: string, userId: string, req: any): Promise<boolean> {
-    const position = await mediaRepository.findMediaPositionById(id);
+    const position = await storage.getMediaPosition(id);
     
     if (!position) {
       throw notFound("Media position", id);
     }
 
-    await mediaRepository.deleteMediaPosition(id);
+    await storage.deleteMediaPosition(id);
 
-    await systemRepository.createAuditLog({
+    await storage.createAuditLog({
       userId,
       action: "delete",
       resource: "media_positions",

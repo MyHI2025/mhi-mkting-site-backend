@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
-import { usersRepository, systemRepository } from "./repositories/implementations";
+import { storage } from "./storage";  
 import { type User, type Role, type Permission } from "@myhealthintegral/shared";
 import dotenv from "dotenv";
 dotenv.config();
@@ -63,7 +63,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
   }
 
   try {
-    const user = await usersRepository.findUserById(decoded.userId);
+    const user = await storage.getUser(decoded.userId);
     if (!user || !user.isActive) {
       return res.status(403).json({ error: "User not found or inactive" });
     }
@@ -79,10 +79,11 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
 
 // Permission checking
 export const getUserPermissions = async (userId: string): Promise<Permission[]> => {
-  const roles = await usersRepository.getUserRoles(userId);
+  const userRoles = await storage.getUserRoles(userId);
   const allPermissions: Permission[] = [];
 
-  for (const role of roles) {
+  for (const userRole of userRoles) {
+    const role = await storage.getRole(userRole.roleId);
     if (role && role.permissions) {
       allPermissions.push(...(role.permissions as Permission[]));
     }
@@ -116,7 +117,7 @@ export const requirePermission = (resource: string, action: string) => {
     const hasAccess = await hasPermission(user.id, resource, action);
     if (!hasAccess) {
       // Log unauthorized access attempt
-      await systemRepository.createAuditLog({
+      await storage.createAuditLog({
         userId: user.id,
         action: "unauthorized_access",
         resource: resource,
@@ -148,7 +149,7 @@ export const createUserSession = async (userId: string): Promise<string> => {
   const refreshToken = generateRefreshToken(userId);
   const expiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRES_IN);
   
-  await systemRepository.createSession(userId, refreshToken, expiresAt);
+  await storage.createSession(userId, refreshToken, expiresAt);
   return refreshToken;
 };
 
@@ -160,7 +161,7 @@ export const refreshAccessToken = async (refreshToken: string): Promise<string |
   }
 
   // Then check if session exists and is not expired
-  const session = await systemRepository.findSessionByToken(refreshToken);
+  const session = await storage.findSessionByToken(refreshToken);
   if (!session) {
     return null;
   }
@@ -168,14 +169,14 @@ export const refreshAccessToken = async (refreshToken: string): Promise<string |
   // Check if session is expired
   if (session.expiresAt! < new Date()) {
     // Clean up expired session
-    await systemRepository.deleteSession(refreshToken);
+    await storage.deleteSession(refreshToken);
     return null;
   }
 
-  const user = await usersRepository.findUserById(session.userId!);
+  const user = await storage.getUser(session.userId!);
   if (!user || !user.isActive) {
     // Clean up invalid session
-    await systemRepository.deleteSession(refreshToken);
+    await storage.deleteSession(refreshToken);
     return null;
   }
 
@@ -188,7 +189,7 @@ export const logoutUser = async (refreshToken: string): Promise<boolean> => {
   const decoded = verifyToken(refreshToken);
   if (decoded && decoded.type === "refresh") {
     // Log the logout action
-    await systemRepository.createAuditLog({
+    await storage.createAuditLog({
       userId: decoded.userId,
       action: "logout",
       resource: "auth",
@@ -200,13 +201,13 @@ export const logoutUser = async (refreshToken: string): Promise<boolean> => {
     });
   }
   
-  const result = await systemRepository.deleteSession(refreshToken);
+  const result = await storage.deleteSession(refreshToken);
   return result.success;
 };
 
 export const logoutAllUserSessions = async (userId: string): Promise<boolean> => {
   // Log the logout all action
-  await systemRepository.createAuditLog({
+  await storage.createAuditLog({
     userId,
     action: "logout_all",
     resource: "auth",
@@ -217,8 +218,8 @@ export const logoutAllUserSessions = async (userId: string): Promise<boolean> =>
     createdAt: new Date(),
   });
   
-  // Note: deleteUserSessions not yet implemented in systemRepository
-  // return await systemRepository.deleteUserSessions(userId);
+  // Note: deleteUserSessions not yet implemented in storage
+  // return await storage.deleteUserSessions(userId);
   return true;
 };
 
@@ -231,7 +232,7 @@ export const logUserAction = async (
   details: any,
   req: Request
 ) => {
-  await systemRepository.createAuditLog({
+  await storage.createAuditLog({
     userId,
     action,
     resource,
@@ -275,16 +276,16 @@ export const validatePasswordStrength = (password: string): { isValid: boolean; 
 
 // Password change tracking for security
 export const requirePasswordChange = async (userId: string): Promise<boolean> => {
-  const user = await usersRepository.findUserById(userId);
+  const user = await storage.getUser(userId);
   if (!user) return false;
   
   // Mark user as requiring password change
-  await usersRepository.updateUser(userId, { 
+  await storage.updateUser(userId, { 
     // Note: We'd need to add a requirePasswordChange field to the schema for this
     // For now, we'll use audit logs to track this
   });
   
-  await systemRepository.createAuditLog({
+  await storage.createAuditLog({
     userId,
     action: "require_password_change",
     resource: "users",

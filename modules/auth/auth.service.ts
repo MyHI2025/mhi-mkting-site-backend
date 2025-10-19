@@ -1,4 +1,4 @@
-import { usersRepository } from '../../repositories/implementations';
+import { storage } from '../../storage';
 import {
   hashPassword,
   verifyPassword,
@@ -20,7 +20,7 @@ export class AuthService {
       throw { status: 429, message: "Too many login attempts. Please try again later." };
     }
 
-    const user = await usersRepository.findUserByUsername(username);
+    const user = await storage.getUserByUsername(username);
     if (!user || !user.isActive) {
       throw { status: 401, message: "Invalid credentials" };
     }
@@ -35,7 +35,7 @@ export class AuthService {
     const accessToken = generateAccessToken(user.id);
     const refreshToken = await createUserSession(user.id);
 
-    await usersRepository.updateUser(user.id, { lastLoginAt: new Date() });
+    await storage.updateUser(user.id, { lastLoginAt: new Date() });
     await logUserAction(user.id, "login", "auth", null, { success: true }, req);
 
     return {
@@ -73,12 +73,18 @@ export class AuthService {
   }
 
   async getCurrentUser(userId: string) {
-    const user = await usersRepository.findUserById(userId);
+    const user = await storage.getUser(userId);
     if (!user) {
       throw { status: 404, message: "User not found" };
     }
 
-    const roles = await usersRepository.getUserRoles(userId);
+    const userRoles = await storage.getUserRoles(userId);
+    const roleIds = userRoles.map(ur => ur.roleId);
+    const roles = [];
+    for (const roleId of roleIds) {
+      const role = await storage.getRole(roleId);
+      if (role) roles.push(role);
+    }
 
     return {
       id: user.id,

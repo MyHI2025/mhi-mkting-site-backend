@@ -1,13 +1,6 @@
 import { hashPassword } from "./auth";
 import { initializeRoles } from "./init-roles";
-import {
-  usersRepository,
-  contentRepository,
-  mediaRepository,
-  navigationRepository,
-  teamRepository,
-  systemRepository
-} from "./repositories/implementations";
+import { storage } from "./storage";
 
 // Initialize default admin user and system data
 export async function initializeAdmin() {
@@ -15,7 +8,7 @@ export async function initializeAdmin() {
     console.log("🔧 Initializing admin system...");
 
     // Check if any admin users exist
-    const existingUsers = await usersRepository.getAllUsers();
+    const existingUsers = await storage.getAllUsers();
     const isFirstRun = existingUsers.length === 0;
     
     let adminUserId: string;
@@ -30,7 +23,7 @@ export async function initializeAdmin() {
 
       const hashedPassword = await hashPassword(defaultAdminPassword);
 
-      const adminUser = await usersRepository.createUser({
+      const adminUser = await storage.createUser({
         username: "admin",
         email: "admin@myhealthintegral.com",
         password: hashedPassword,
@@ -47,7 +40,7 @@ export async function initializeAdmin() {
       console.log("   ⚠️  PLEASE CHANGE THE PASSWORD AFTER FIRST LOGIN");
 
       // Log the admin creation
-      await systemRepository.createAuditLog({
+      await storage.createAuditLog({
         userId: adminUser.id,
         action: "create",
         resource: "users",
@@ -58,30 +51,28 @@ export async function initializeAdmin() {
         },
         ipAddress: "127.0.0.1",
         userAgent: "System Initialization",
-        createdAt: new Date(),
       });
 
-      // Initialize default marketing pages
-      await initializeDefaultPages(adminUserId);
-      
-      // Initialize navigation structure
-      await initializeDefaultNavigation(adminUserId);
-      
-      // Initialize default team members
-      await initializeDefaultTeamMembers(adminUserId);
-      
-      console.log("🎉 Admin system initialization complete!");
+      console.log("✅ Admin user created successfully!");
     } else {
       // Get the existing admin user ID
       const adminUser = existingUsers[0];
       adminUserId = adminUser.id;
+      console.log("✅ Existing admin user found");
     }
     
     // Always initialize roles and permissions (assigns role to admin user if needed)
     await initializeRoles();
     
-    // Always check and initialize media positions (runs even if admin exists)
+    // Always check and initialize content (each function has its own existence check)
+    await initializeDefaultPages(adminUserId);
+    await initializeDefaultNavigation(adminUserId);
+    await initializeDefaultTeamMembers(adminUserId);
+    await initializeRealArticles(adminUserId);
+    await initializeRealJobs(adminUserId);
     await initializeDefaultMediaPositions(adminUserId);
+    
+    console.log("🎉 Admin system initialization complete!");
 
   } catch (error) {
     console.error("❌ Failed to initialize admin system:", error);
@@ -94,7 +85,7 @@ async function initializeDefaultPages(adminUserId: string) {
     console.log("📄 Initializing marketing pages...");
     
     // Check if pages already exist
-    const existingPages = await contentRepository.getAllPages();
+    const existingPages = await storage.getAllPages();
     if (existingPages.length > 0) {
       console.log("✅ Marketing pages already exist");
       return;
@@ -225,10 +216,10 @@ async function initializeDefaultPages(adminUserId: string) {
 
     // Create each page
     for (const pageData of pages) {
-      const page = await contentRepository.createPage(pageData);
+      const page = await storage.createPage(pageData);
       
       // Update with creator info
-      await contentRepository.updatePage(page.id, {
+      await storage.updatePage(page.id, {
         createdBy: adminUserId,
         updatedBy: adminUserId,
         isPublished: true,
@@ -250,7 +241,7 @@ async function initializeDefaultNavigation(adminUserId: string) {
     console.log("🔗 Initializing navigation structure...");
     
     // Check if navigation already exists
-    const existingNavItems = await navigationRepository.getAllNavigationItems();
+    const existingNavItems = await storage.getAllNavigationItems();
     if (existingNavItems.length > 0) {
       console.log("✅ Navigation structure already exists");
       return;
@@ -337,7 +328,7 @@ async function initializeDefaultNavigation(adminUserId: string) {
     const createdItems: { [key: string]: any } = {};
     
     for (const navItem of navItems) {
-      const item = await navigationRepository.createNavigationItem(navItem);
+      const item = await storage.createNavigationItem(navItem);
       createdItems[navItem.label] = item;
       console.log(`   ✓ Created nav item: ${navItem.label}`);
     }
@@ -396,7 +387,7 @@ async function initializeDefaultNavigation(adminUserId: string) {
     ];
 
     for (const dropdownItem of dropdownItems) {
-      await navigationRepository.createNavigationItem(dropdownItem);
+      await storage.createNavigationItem(dropdownItem);
       console.log(`     ✓ Created dropdown item: ${dropdownItem.label}`);
     }
 
@@ -412,7 +403,7 @@ async function initializeDefaultTeamMembers(adminUserId: string) {
     console.log("👥 Initializing team members...");
     
     // Check if team members already exist
-    const existingMembers = await teamRepository.getAllTeamMembers();
+    const existingMembers = await storage.getAllTeamMembers();
     if (existingMembers.length > 0) {
       console.log("✅ Team members already exist");
       return;
@@ -421,7 +412,8 @@ async function initializeDefaultTeamMembers(adminUserId: string) {
     // Define default team members
     const teamMembers = [
       {
-        name: "David Izuogu",
+        firstName: "David",
+        lastName: "Izuogu",
         role: "Founder and CEO",
         bio: "Visionary leader driving digital healthcare transformation with expertise in healthcare innovation, technology integration, and global market expansion.",
         linkedin: "https://www.linkedin.com/in/david-chukwuma-izuogu",
@@ -437,7 +429,8 @@ async function initializeDefaultTeamMembers(adminUserId: string) {
         photoAlt: null,
       },
       {
-        name: "Anita Enwere",
+        firstName: "Anita",
+        lastName: "Enwere",
         role: "Co-Founder and COO/CMD",
         bio: "Strategic operations leader with deep healthcare expertise, focusing on operational excellence, medical oversight, and healthcare delivery optimization.",
         linkedin: "https://www.linkedin.com/in/chisom-anita-enwere-9810b3264",
@@ -455,8 +448,8 @@ async function initializeDefaultTeamMembers(adminUserId: string) {
     ];
 
     for (const member of teamMembers) {
-      await teamRepository.createTeamMember(member);
-      console.log(`   ✓ Created team member: ${member.name}`);
+      await storage.createTeamMember(member);
+      console.log(`   ✓ Created team member: ${member.firstName} ${member.lastName}`);
     }
 
     console.log(`✅ Created ${teamMembers.length} team members successfully!`);
@@ -466,12 +459,454 @@ async function initializeDefaultTeamMembers(adminUserId: string) {
   }
 }
 
+async function initializeRealArticles(adminUserId: string) {
+  try {
+    console.log("📝 Initializing real blog articles from live website...");
+    
+    // Check if blog articles already exist
+    const existingArticles = await storage.getAllPages();
+    const blogArticles = existingArticles.filter(p => p.pageType === "blog");
+    if (blogArticles.length > 0) {
+      console.log("✅ Blog articles already exist");
+      return;
+    }
+
+    // Define the 3 unique real articles from the live website
+    const realArticles = [
+      {
+        slug: "blog/overcoming-challenges-with-mhi-a-complete-guide-for-private-physicians",
+        title: "Overcoming Challenges with MHI: A Complete Guide for Private Physicians",
+        description: "Private physicians face unique challenges in modern healthcare delivery. From managing patient relationships to navigating complex regulatory requirements, the demands on independent practices continue to grow. This comprehensive guide explores how My Health Integral (MHI) addresses these challenges through innovative digital solutions, helping physicians maintain their independence while delivering exceptional patient care.",
+        topicTags: ["MHI Innovation", "Telemedicine Tips"],
+        targetUserTypes: ["Private Physicians"],
+        isPublished: true,
+      },
+      {
+        slug: "blog/digital-health-simplified-how-mhi-breaks-down-barriers-for-patients",
+        title: "Digital Health, Simplified: How MHI Breaks Down Barriers for Patients",
+        description: "For many patients, navigating the healthcare system can feel overwhelming. From booking appointments to managing prescriptions and understanding treatment options, the complexity often creates barriers to care. My Health Integral (MHI) is transforming this experience by breaking down these barriers through intuitive, patient-centered digital solutions that make healthcare accessible, understandable, and manageable for everyone.",
+        topicTags: ["Health and Wellness", "MHI Innovation"],
+        targetUserTypes: ["Patients"],
+        isPublished: true,
+      },
+      {
+        slug: "blog/healthcare-at-your-fingertips-how-mhi-is-changing-the-patient-experience",
+        title: "Healthcare at Your Fingertips: How MHI is Changing the Patient Experience",
+        description: "The future of healthcare is here, and it's literally at your fingertips. My Health Integral (MHI) is revolutionizing how patients interact with the healthcare system by putting comprehensive health services directly into their hands through innovative mobile and web platforms. This transformation goes beyond simple convenience—it's about fundamentally reimagining the patient experience for the digital age.",
+        topicTags: ["Telemedicine Tips", "Health and Wellness"],
+        targetUserTypes: ["Patients"],
+        isPublished: true,
+      },
+    ];
+
+    // Create each article
+    for (const article of realArticles) {
+      await storage.createPage({
+        ...article,
+        pageType: "blog",
+        metaTitle: `${article.title} | My Health Integral Blog`,
+        metaDescription: article.description,
+      });
+      console.log(`   ✓ Created article: ${article.title}`);
+    }
+
+    console.log(`✅ Created ${realArticles.length} blog articles successfully!`);
+  } catch (error) {
+    console.error("❌ Failed to initialize blog articles:", error);
+  }
+}
+
+async function initializeRealJobs(adminUserId: string) {
+  try {
+    console.log("💼 Initializing real job postings from live website...");
+    
+    // Check if job postings already exist
+    const existingPages = await storage.getAllPages();
+    const jobPostings = existingPages.filter(p => p.pageType === "job");
+    if (jobPostings.length > 0) {
+      console.log("✅ Job postings already exist");
+      return;
+    }
+
+    // Define all 35 real job postings from the live website
+    const realJobs = [
+      {
+        slug: "careers/sales-representative",
+        title: "Sales Representative",
+        description: "Drive revenue by promoting MHI's healthcare solutions to potential clients, including hospitals, clinics, and providers.",
+        metadata: {
+          department: "Sales Representative",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/frontend-developer",
+        title: "Frontend Developer",
+        description: "Design and develop responsive user interfaces for MHI's web and mobile applications to enhance user experience.",
+        metadata: {
+          department: "Frontend Developer",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/backend-developer",
+        title: "Backend Developer",
+        description: "Build and maintain robust server-side systems, APIs, and databases that power MHI's healthcare platform.",
+        metadata: {
+          department: "Backend Developer",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/ai-ml-engineer",
+        title: "AI/ML Engineer",
+        description: "Develop and integrate AI/ML solutions for predictive diagnostics, patient analytics, and other innovative healthcare features.",
+        metadata: {
+          department: "AI/ML Engineer",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/mobile-app-developer",
+        title: "Mobile App Developer",
+        description: "Create and optimize MHI's mobile applications for iOS and Android to ensure seamless healthcare access on the go.",
+        metadata: {
+          department: "Mobile App Developer",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/ui-ux-designer",
+        title: "UI/UX Designer",
+        description: "Design intuitive and visually appealing user interfaces and experiences for MHI's digital healthcare platform.",
+        metadata: {
+          department: "UI/UX Designer",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/head-of-technology",
+        title: "Head of Technology",
+        description: "Lead MHI's technology strategy, oversee development teams, and ensure the platform's technical excellence and scalability.",
+        metadata: {
+          department: "Head of Technology",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/human-resources-officer",
+        title: "Human Resources Officer",
+        description: "Manage recruitment, employee relations, and HR policies to build a strong and motivated team at MHI.",
+        metadata: {
+          department: "Human Resources Officer",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/customer-support-officer",
+        title: "Customer Support Officer",
+        description: "Provide exceptional support to MHI users, addressing inquiries and resolving issues to ensure a seamless experience.",
+        metadata: {
+          department: "Customer Support Officer",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/graphic-designer",
+        title: "Graphic Designer",
+        description: "Create compelling visual content for MHI's marketing campaigns, website, and social media to enhance brand identity.",
+        metadata: {
+          department: "Graphic Designer",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/content-creator-writer",
+        title: "Content Creator/Writer",
+        description: "Produce engaging and informative content for MHI's blogs, newsletters, and marketing materials to educate and inspire audiences.",
+        metadata: {
+          department: "Content Creator/Writer",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/video-content-creator-editor",
+        title: "Video Content Creator/Editor",
+        description: "Develop and edit high-quality video content for MHI's promotional campaigns, tutorials, and social media platforms.",
+        metadata: {
+          department: "Video Content Creator/Editor",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/social-media-manager",
+        title: "Social Media Manager",
+        description: "Manage MHI's social media presence, engage with audiences, and execute strategies to grow brand awareness and community.",
+        metadata: {
+          department: "Social Media Manager",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/legal-and-compliance-associate",
+        title: "Legal and Compliance Associate",
+        description: "Ensure MHI's operations comply with healthcare regulations and manage legal matters to mitigate risks.",
+        metadata: {
+          department: "Legal and Compliance Associate",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/finance-officer",
+        title: "Finance Officer",
+        description: "Oversee MHI's financial planning, budgeting, and reporting to ensure fiscal responsibility and support growth.",
+        metadata: {
+          department: "Finance Officer",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/project-manager",
+        title: "Project Manager",
+        description: "Plan, coordinate, and execute MHI's projects, ensuring timely delivery and alignment with organizational goals.",
+        metadata: {
+          department: "Project Manager",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/executive-assistant",
+        title: "Executive Assistant",
+        description: "Provide administrative support to MHI's leadership team, managing schedules, communications, and organizational tasks.",
+        metadata: {
+          department: "Executive Assistant",
+          location: "Remote",
+          type: "Full-time",
+        },
+      },
+      {
+        slug: "careers/ui-ux-designer-volunteer",
+        title: "UI/UX Designer (Volunteer)",
+        description: "Contribute your design skills to enhance MHI's user interfaces and experiences, making healthcare more accessible.",
+        metadata: {
+          department: "UI/UX Designer",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/frontend-developer-volunteer",
+        title: "Frontend Developer (Volunteer)",
+        description: "Help build and refine MHI's frontend applications, contributing to innovative healthcare technology.",
+        metadata: {
+          department: "Frontend Developer",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/backend-developer-volunteer",
+        title: "Backend Developer (Volunteer)",
+        description: "Support MHI's backend infrastructure by developing and maintaining server-side systems and APIs.",
+        metadata: {
+          department: "Backend Developer",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/market-researcher-research-analyst",
+        title: "Market Researcher/Research Analyst",
+        description: "Conduct research and analysis to support MHI's strategic decisions and market positioning in the healthcare sector.",
+        metadata: {
+          department: "Market Researcher/Research Analyst",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/ai-ml-engineer-volunteer",
+        title: "AI/ML Engineer (Volunteer)",
+        description: "Apply your AI/ML expertise to develop innovative features that enhance MHI's healthcare solutions.",
+        metadata: {
+          department: "AI/ML Engineer",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/business-development-officer",
+        title: "Business Development Officer",
+        description: "Identify and pursue new business opportunities to expand MHI's reach and drive organizational growth.",
+        metadata: {
+          department: "Business Development Officer",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/business-and-financial-analyst",
+        title: "Business and Financial Analyst",
+        description: "Analyze business and financial data to provide insights that support MHI's strategic planning and decision-making.",
+        metadata: {
+          department: "Business and Financial Analyst",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/business-analyst",
+        title: "Business Analyst",
+        description: "Evaluate business processes and systems to identify opportunities for improvement and support MHI's objectives.",
+        metadata: {
+          department: "Business Analyst",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/fullstack-developer",
+        title: "Fullstack Developer",
+        description: "Work on both frontend and backend development to deliver comprehensive solutions for MHI's healthcare platform.",
+        metadata: {
+          department: "Fullstack Developer",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/medical-laboratory-scientist",
+        title: "Medical Laboratory Scientist",
+        description: "Leverage your laboratory expertise to enhance MHI's diagnostic services and support accurate patient care.",
+        metadata: {
+          department: "Medical Laboratory Scientist",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/radiologist",
+        title: "Radiologist",
+        description: "Provide imaging expertise to improve MHI's diagnostic capabilities and patient outcomes.",
+        metadata: {
+          department: "Radiologist",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/pharmacist",
+        title: "Pharmacist",
+        description: "Contribute your pharmaceutical knowledge to MHI's medication management and patient education initiatives.",
+        metadata: {
+          department: "Pharmacist",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/physician",
+        title: "Physician",
+        description: "Provide medical expertise and patient care through MHI's telemedicine and healthcare delivery services.",
+        metadata: {
+          department: "Physician",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/health-insurance-specialist",
+        title: "Health Insurance Specialist",
+        description: "Support MHI's insurance integration and help patients navigate coverage options for seamless healthcare access.",
+        metadata: {
+          department: "Health Insurance Specialist",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/partnership-manager",
+        title: "Partnership Manager",
+        description: "Establish and nurture strategic partnerships with organizations aligned with MHI's mission to drive growth and impact.",
+        metadata: {
+          department: "Partnership Manager",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/marketing-and-sales-officer",
+        title: "Marketing and Sales Officer",
+        description: "Develop and execute marketing and sales strategies to build MHI's brand, generate leads, and support market entry.",
+        metadata: {
+          department: "Marketing and Sales Officer",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/grant-and-funding-specialist",
+        title: "Grant and Funding Specialist",
+        description: "Identify, apply for, and secure funding opportunities to support MHI's programs and growth initiatives.",
+        metadata: {
+          department: "Grant and Funding Specialist",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      },
+      {
+        slug: "careers/data-analyst",
+        title: "Data Analyst",
+        description: "Analyze healthcare data to provide insights that drive strategic decisions and improve patient outcomes across MHI's platform.",
+        metadata: {
+          department: "Data Analyst",
+          location: "Remote",
+          type: "Volunteer",
+        },
+      }
+    ];
+
+    // Create each job posting
+    for (const job of realJobs) {
+      await storage.createPage({
+        ...job,
+        pageType: "job",
+        category: job.metadata.department,
+        metaTitle: `${job.title} - Careers | My Health Integral`,
+        metaDescription: job.description,
+        isPublished: true,
+      });
+      console.log(`   ✓ Created job: ${job.title}`);
+    }
+
+    console.log(`✅ Created ${realJobs.length} job postings successfully!`);
+  } catch (error) {
+    console.error("❌ Failed to initialize job postings:", error);
+  }
+}
+
 async function initializeDefaultMediaPositions(adminUserId: string) {
   try {
     console.log("🖼️  Initializing media positions...");
     
     // Get existing media positions to check which ones are missing
-    const existingPositions = await mediaRepository.getAllMediaPositions();
+    const existingPositions = await storage.getAllMediaPositions();
     const existingKeys = new Set(existingPositions.map(p => p.positionKey));
 
     // Define all media positions for the website
@@ -561,7 +996,7 @@ async function initializeDefaultMediaPositions(adminUserId: string) {
         continue;
       }
       
-      await mediaRepository.createMediaPosition({
+      await storage.createMediaPosition({
         ...position,
         isActive: true,
         mediaUrl: null,

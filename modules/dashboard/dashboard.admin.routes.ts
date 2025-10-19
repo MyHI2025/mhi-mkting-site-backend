@@ -1,98 +1,58 @@
 import { Router } from "express";
-import { z } from "zod";
-import { systemRepository } from "../../repositories/implementations/system.repository.impl";
+import { storage } from "../../storage";
 import { asyncHandler } from "../common/errorHandlers";
 import { authenticateToken } from "../common";
-import { insertDashboardWidgetSchema } from "@myhealthintegral/shared";
 
 const router = Router();
 
-// Get user's dashboard widgets
-router.get("/widgets", authenticateToken, asyncHandler(async (req, res) => {
+// Get dashboard statistics
+router.get("/stats", authenticateToken, asyncHandler(async (req, res) => {
   const userId = (req as any).user?.id;
   if (!userId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  const widgets = await systemRepository.getUserWidgets(userId);
-  res.json(widgets);
-}));
+  // Get counts for all content types
+  const [
+    allPages,
+    videos,
+    contacts,
+    teamMembers,
+    mediaPositions,
+    navigationItems
+  ] = await Promise.all([
+    storage.getAllPages(),
+    storage.getAllVideos(),
+    storage.getAllContacts(),
+    storage.getAllTeamMembers(),
+    storage.getAllMediaPositions(),
+    storage.getAllNavigationItems()
+  ]);
 
-// Create a new widget
-router.post("/widgets", authenticateToken, asyncHandler(async (req, res) => {
-  const userId = (req as any).user?.id;
-  if (!userId) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+  // Filter pages by type
+  const marketingPages = allPages.filter(p => p.pageType === 'marketing');
+  const articles = allPages.filter(p => p.pageType === 'blog');
+  const jobs = allPages.filter(p => p.pageType === 'job');
 
-  const validatedData = insertDashboardWidgetSchema.parse({ ...req.body, userId });
+  // Debug: log pageTypes
+  console.log('📊 Dashboard Stats Debug:');
+  console.log(`   Total pages: ${allPages.length}`);
+  console.log(`   Page types: ${allPages.map(p => p.pageType).join(', ')}`);
+  console.log(`   Marketing: ${marketingPages.length}, Articles: ${articles.length}, Jobs: ${jobs.length}`);
 
-  const widget = await systemRepository.createWidget(validatedData);
-  res.status(201).json(widget);
-}));
+  const stats = {
+    pages: marketingPages.length,
+    articles: articles.length,
+    videos: videos.length,
+    jobs: jobs.length,
+    contacts: contacts.length,
+    teamMembers: teamMembers.length,
+    mediaPositions: mediaPositions.length,
+    navigationItems: navigationItems.length,
+    totalContent: marketingPages.length + articles.length + videos.length + jobs.length
+  };
 
-// Update a widget
-router.patch("/widgets/:id", authenticateToken, asyncHandler(async (req, res) => {
-  const userId = (req as any).user?.id;
-  if (!userId) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
-  const { id } = req.params;
-  const updateSchema = insertDashboardWidgetSchema.partial();
-  const validatedData = updateSchema.parse(req.body);
-
-  const widget = await systemRepository.updateWidget(id, validatedData);
-  
-  // Verify ownership
-  if (widget.userId !== userId) {
-    return res.status(403).json({ error: "Forbidden" });
-  }
-
-  res.json(widget);
-}));
-
-// Delete a widget
-router.delete("/widgets/:id", authenticateToken, asyncHandler(async (req, res) => {
-  const userId = (req as any).user?.id;
-  if (!userId) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
-  const { id } = req.params;
-  await systemRepository.deleteWidget(id);
-  res.json({ success: true, message: "Widget deleted successfully" });
-}));
-
-// Update widget layout (batch update for drag-and-drop)
-router.post("/widgets/layout", authenticateToken, asyncHandler(async (req, res) => {
-  const userId = (req as any).user?.id;
-  if (!userId) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
-  const layoutSchema = z.object({
-    widgets: z.array(z.object({
-      id: z.string(),
-      displayOrder: z.number(),
-      gridPosition: z.any().optional(),
-    })),
-  });
-
-  const { widgets } = layoutSchema.parse(req.body);
-  const updatedWidgets = await systemRepository.updateWidgetLayout(userId, widgets);
-  res.json(updatedWidgets);
-}));
-
-// Reset to default layout
-router.post("/widgets/reset", authenticateToken, asyncHandler(async (req, res) => {
-  const userId = (req as any).user?.id;
-  if (!userId) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
-  const defaultWidgets = await systemRepository.resetUserWidgets(userId);
-  res.json(defaultWidgets);
+  res.json(stats);
 }));
 
 export default router;

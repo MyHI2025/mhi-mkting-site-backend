@@ -14,7 +14,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@myhealthintegral/shared": "github:MyHI2025/mhi-mkting-site-shared#main",
+    "@myhealthintegral/shared": "file:../mhi-mkting-site-shared",
     "@neondatabase/serverless": "^0.10.4",
     "bcryptjs": "^3.0.2",
     "connect-pg-simple": "^10.0.0",

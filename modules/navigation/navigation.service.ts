@@ -1,4 +1,4 @@
-import { navigationRepository } from '../../repositories/implementations';
+import { storage } from '../../storage';
 import { logUserAction } from '../../auth';
 import { insertNavigationItemSchema } from '@myhealthintegral/shared';
 import { z } from 'zod';
@@ -7,25 +7,15 @@ import { notFound } from '../common/errorHandlers';
 
 export class NavigationService {
   async getAllNavigationItems() {
-    return await navigationRepository.getAllNavigationItems();
+    return await storage.getAllNavigationItems();
   }
 
   async getNavigationTree() {
-    const items = await navigationRepository.getAllNavigationItems();
-    const buildTree = (parentId: string | null = null): any[] => {
-      return items
-        .filter(item => item.parentId === parentId)
-        .sort((a, b) => (a.order || 0) - (b.order || 0))
-        .map(item => ({
-          ...item,
-          children: buildTree(item.id)
-        }));
-    };
-    return buildTree();
+    return await storage.getNavigationTree();
   }
 
   async createNavigationItem(data: z.infer<typeof insertNavigationItemSchema>, currentUserId: string, req: Request) {
-    const newItem = await navigationRepository.createNavigationItem(data);
+    const newItem = await storage.createNavigationItem(data);
     
     await logUserAction(currentUserId, "create", "navigation", newItem.id, { 
       item_label: newItem.label,
@@ -36,7 +26,10 @@ export class NavigationService {
   }
 
   async updateNavigationItem(id: string, data: any, currentUserId: string, req: Request) {
-    const updatedItem = await navigationRepository.updateNavigationItem(id, data);
+    const updatedItem = await storage.updateNavigationItem(id, data);
+    if (!updatedItem) {
+      throw notFound("Navigation item", id);
+    }
     
     await logUserAction(currentUserId, "update", "navigation", id, { 
       item_label: updatedItem.label 
@@ -46,22 +39,18 @@ export class NavigationService {
   }
 
   async deleteNavigationItem(id: string, currentUserId: string, req: Request) {
-    const item = await navigationRepository.findNavigationById(id);
-    if (!item) {
+    const deleted = await storage.deleteNavigationItem(id);
+    if (!deleted) {
       throw notFound("Navigation item", id);
     }
     
-    await navigationRepository.deleteNavigationItem(id);
-    
-    await logUserAction(currentUserId, "delete", "navigation", id, { 
-      item_label: item.label 
-    }, req);
+    await logUserAction(currentUserId, "delete", "navigation", id, {}, req);
     
     return { message: "Navigation item deleted successfully" };
   }
 
   async reorderNavigationItems(itemOrders: any[], currentUserId: string, req: Request) {
-    await navigationRepository.reorderNavigationItems(itemOrders);
+    await storage.reorderNavigationItems(itemOrders);
     
     await logUserAction(currentUserId, "reorder", "navigation", null, { 
       action: "reorder_items", 

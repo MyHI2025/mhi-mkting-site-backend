@@ -6,7 +6,7 @@ import { insertContactSchema, insertThemeSettingsSchema, insertSystemSettingSche
 import { authenticateToken, requirePermission, logUserAction } from "./auth";
 import { uploadDirectory } from "./modules/media/media.config";
 import { asyncHandler, sendErrorResponse } from "./modules/common/errorHandlers";
-import { contentRepository, systemRepository } from "./repositories/implementations";
+import { storage } from "./storage";
 
 import authRouter from "./modules/auth";
 import usersRouter from "./modules/users";
@@ -42,7 +42,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/v1/admin/dashboard", dashboardAdminRouter);
 
   app.get("/api/v1/public/settings/ga", asyncHandler(async (req, res) => {
-    const setting = await systemRepository.getSetting("ga_measurement_id");
+    const setting = await storage.getSetting("ga_measurement_id");
     if (!setting || !setting.value) {
       return res.status(404).json({ error: "GA measurement ID not configured" });
     }
@@ -51,7 +51,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/v1/public/contact", asyncHandler(async (req, res) => {
     const validatedData = insertContactSchema.parse(req.body);
-    const contact = await contentRepository.createContact(validatedData);
+    const contact = await storage.createContact(validatedData);
     
     // Sync to Zoho CRM asynchronously (don't block the response)
     import('./services/zoho.service').then(({ zohoCRM }) => {
@@ -73,7 +73,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
 
   app.get("/api/v1/admin/contacts", authenticateToken, requirePermission("content", "read"), asyncHandler(async (req, res) => {
-    const contacts = await contentRepository.getAllContacts();
+    const contacts = await storage.getAllContacts();
     res.json(contacts);
   }));
 
@@ -92,12 +92,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (contactIds && contactIds.length > 0) {
       // Sync specific contacts
       const contactPromises = await Promise.all(
-        contactIds.map(id => contentRepository.getContactById(id))
+        contactIds.map(id => storage.getContactById(id))
       );
       contacts = contactPromises.filter((c): c is NonNullable<typeof c> => c !== null);
     } else {
       // Sync all contacts
-      contacts = await contentRepository.getAllContacts();
+      contacts = await storage.getAllContacts();
     }
 
     const result = await zohoCRM.createLeads(contacts);
@@ -128,18 +128,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (validatedQuery.action) filters.action = validatedQuery.action;
     if (validatedQuery.limit) filters.limit = validatedQuery.limit;
     
-    const logs = await systemRepository.getAuditLogs(filters);
+    const logs = await storage.getAuditLogs(filters);
     res.json(logs);
   }));
 
   app.get("/api/v1/admin/settings", authenticateToken, requirePermission("users", "read"), asyncHandler(async (req, res) => {
-    const settings = await systemRepository.getAllSettings();
+    const settings = await storage.getAllSettings();
     res.json(settings);
   }));
 
   app.get("/api/v1/admin/settings/:key", authenticateToken, requirePermission("users", "read"), asyncHandler(async (req, res) => {
     const { key } = req.params;
-    const setting = await systemRepository.getSetting(key);
+    const setting = await storage.getSetting(key);
     if (!setting) {
       return res.status(404).json({ error: "Setting not found" });
     }
@@ -150,7 +150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const validatedData = insertSystemSettingSchema.parse(req.body);
     const currentUser = (req as any).user;
     
-    const setting = await systemRepository.upsertSetting({
+    const setting = await storage.upsertSetting({
       ...validatedData,
       updatedBy: currentUser.id,
     });
@@ -164,12 +164,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
 
   app.get("/api/v1/admin/themes", authenticateToken, requirePermission("themes", "read"), asyncHandler(async (req, res) => {
-    const themes = await systemRepository.getAllThemes();
+    const themes = await storage.getAllThemes();
     res.json(themes);
   }));
 
   app.get("/api/v1/admin/themes/active", authenticateToken, requirePermission("themes", "read"), asyncHandler(async (req, res) => {
-    const activeTheme = await systemRepository.getActiveTheme();
+    const activeTheme = await storage.getActiveTheme();
     res.json(activeTheme);
   }));
 
@@ -177,7 +177,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const validatedData = insertThemeSettingsSchema.parse(req.body);
     const currentUser = (req as any).user;
     
-    const newTheme = await systemRepository.createTheme(validatedData);
+    const newTheme = await storage.createTheme(validatedData);
     
     await logUserAction(currentUser.id, "create", "themes", newTheme.id, { 
       theme_name: newTheme.name 
@@ -190,7 +190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { id } = req.params;
     const currentUser = (req as any).user;
     
-    const updatedTheme = await systemRepository.updateTheme(id, req.body);
+    const updatedTheme = await storage.updateTheme(id, req.body);
     
     await logUserAction(currentUser.id, "update", "themes", id, { 
       theme_name: updatedTheme.name 
@@ -203,7 +203,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { id } = req.params;
     const currentUser = (req as any).user;
     
-    const result = await systemRepository.deleteTheme(id);
+    const result = await storage.deleteTheme(id);
     
     await logUserAction(currentUser.id, "delete", "themes", id, {}, req);
     
@@ -214,7 +214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { id } = req.params;
     const currentUser = (req as any).user;
     
-    const activatedTheme = await systemRepository.activateTheme(id);
+    const activatedTheme = await storage.activateTheme(id);
     
     await logUserAction(currentUser.id, "activate", "themes", id, { 
       theme_name: activatedTheme.name 

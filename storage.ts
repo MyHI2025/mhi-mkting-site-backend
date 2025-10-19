@@ -146,6 +146,496 @@ export interface IStorage {
   deleteSetting(key: string): Promise<boolean>;
 }
 
+// PostgreSQL Storage Implementation
+import { db } from "./db";
+import { eq, and, desc, asc, sql as drizzleSql } from "drizzle-orm";
+import { 
+  users as usersTable, roles as rolesTable, userRoles as userRolesTable,
+  adminSessions as adminSessionsTable, contacts as contactsTable,
+  pages as pagesTable, contentNodes as contentNodesTable,
+  contentSections as contentSectionsTable, contentBlocks as contentBlocksTable,
+  mediaAssets as mediaAssetsTable, navigationItems as navigationItemsTable,
+  themeSettings as themeSettingsTable, teamMembers as teamMembersTable,
+  mediaPositions as mediaPositionsTable, videoContent as videoContentTable,
+  auditLogs as auditLogsTable, systemSettings as systemSettingsTable
+} from "@myhealthintegral/shared";
+
+export class DbStorage implements IStorage {
+  // User management
+  async getUser(id: string): Promise<User | undefined> {
+    const result = await db.select().from(usersTable).where(eq(usersTable.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const result = await db.select().from(usersTable).where(eq(usersTable.username, username)).limit(1);
+    return result[0];
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const result = await db.select().from(usersTable).where(eq(usersTable.email, email)).limit(1);
+    return result[0];
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const result = await db.insert(usersTable).values(user).returning();
+    return result[0];
+  }
+
+  async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
+    const result = await db.update(usersTable)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(usersTable.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteUser(id: string): Promise<boolean> {
+    await db.delete(usersTable).where(eq(usersTable.id, id));
+    return true;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return db.select().from(usersTable);
+  }
+
+  // Roles and permissions
+  async getRole(id: string): Promise<Role | undefined> {
+    const result = await db.select().from(rolesTable).where(eq(rolesTable.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getRoleByName(name: string): Promise<Role | undefined> {
+    const result = await db.select().from(rolesTable).where(eq(rolesTable.name, name)).limit(1);
+    return result[0];
+  }
+
+  async createRole(role: InsertRole): Promise<Role> {
+    const result = await db.insert(rolesTable).values(role).returning();
+    return result[0];
+  }
+
+  async updateRole(id: string, updates: Partial<Role>): Promise<Role | undefined> {
+    const result = await db.update(rolesTable)
+      .set(updates)
+      .where(eq(rolesTable.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteRole(id: string): Promise<boolean> {
+    await db.delete(rolesTable).where(eq(rolesTable.id, id));
+    return true;
+  }
+
+  async getAllRoles(): Promise<Role[]> {
+    return db.select().from(rolesTable);
+  }
+
+  async getUserRoles(userId: string): Promise<UserRole[]> {
+    return db.select().from(userRolesTable).where(eq(userRolesTable.userId, userId));
+  }
+
+  async assignUserRole(userId: string, roleId: string): Promise<UserRole> {
+    const result = await db.insert(userRolesTable)
+      .values({ userId, roleId })
+      .returning();
+    return result[0];
+  }
+
+  async removeUserRole(userId: string, roleId: string): Promise<boolean> {
+    await db.delete(userRolesTable)
+      .where(and(eq(userRolesTable.userId, userId), eq(userRolesTable.roleId, roleId)));
+    return true;
+  }
+
+  // Admin sessions
+  async createSession(userId: string, token: string, expiresAt: Date): Promise<AdminSession> {
+    const result = await db.insert(adminSessionsTable)
+      .values({ userId, token, expiresAt })
+      .returning();
+    return result[0];
+  }
+
+  async getSession(token: string): Promise<AdminSession | undefined> {
+    const result = await db.select().from(adminSessionsTable).where(eq(adminSessionsTable.token, token)).limit(1);
+    return result[0];
+  }
+
+  async deleteSession(token: string): Promise<boolean> {
+    await db.delete(adminSessionsTable).where(eq(adminSessionsTable.token, token));
+    return true;
+  }
+
+  async deleteUserSessions(userId: string): Promise<boolean> {
+    await db.delete(adminSessionsTable).where(eq(adminSessionsTable.userId, userId));
+    return true;
+  }
+
+  // Contact management
+  async createContact(contact: InsertContact): Promise<Contact> {
+    const result = await db.insert(contactsTable).values(contact).returning();
+    return result[0];
+  }
+
+  async getAllContacts(): Promise<Contact[]> {
+    return db.select().from(contactsTable).orderBy(desc(contactsTable.createdAt));
+  }
+
+  // Page management
+  async getPage(id: string): Promise<Page | undefined> {
+    const result = await db.select().from(pagesTable).where(eq(pagesTable.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getPageBySlug(slug: string): Promise<Page | undefined> {
+    const result = await db.select().from(pagesTable).where(eq(pagesTable.slug, slug)).limit(1);
+    return result[0];
+  }
+
+  async createPage(page: InsertPage): Promise<Page> {
+    const result = await db.insert(pagesTable).values(page).returning();
+    return result[0];
+  }
+
+  async updatePage(id: string, updates: Partial<Page>): Promise<Page | undefined> {
+    const result = await db.update(pagesTable)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(pagesTable.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deletePage(id: string): Promise<boolean> {
+    await db.delete(pagesTable).where(eq(pagesTable.id, id));
+    return true;
+  }
+
+  async getAllPages(): Promise<Page[]> {
+    return db.select().from(pagesTable).orderBy(desc(pagesTable.createdAt));
+  }
+
+  async getPublishedPages(): Promise<Page[]> {
+    return db.select().from(pagesTable)
+      .where(eq(pagesTable.isPublished, true))
+      .orderBy(desc(pagesTable.publishedAt));
+  }
+
+  async publishPage(id: string, userId: string): Promise<Page | undefined> {
+    const result = await db.update(pagesTable)
+      .set({ isPublished: true, publishedAt: new Date(), updatedBy: userId, updatedAt: new Date() })
+      .where(eq(pagesTable.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async unpublishPage(id: string): Promise<Page | undefined> {
+    const result = await db.update(pagesTable)
+      .set({ isPublished: false, updatedAt: new Date() })
+      .where(eq(pagesTable.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async getPagesByType(pageType: string): Promise<Page[]> {
+    return db.select().from(pagesTable)
+      .where(eq(pagesTable.pageType, pageType))
+      .orderBy(desc(pagesTable.createdAt));
+  }
+
+  // Navigation items
+  async getNavigationItem(id: string): Promise<NavigationItem | undefined> {
+    const result = await db.select().from(navigationItemsTable).where(eq(navigationItemsTable.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getAllNavigationItems(): Promise<NavigationItem[]> {
+    return db.select().from(navigationItemsTable).orderBy(asc(navigationItemsTable.displayOrder));
+  }
+
+  async createNavigationItem(item: InsertNavigationItem): Promise<NavigationItem> {
+    const result = await db.insert(navigationItemsTable).values(item).returning();
+    return result[0];
+  }
+
+  async updateNavigationItem(id: string, updates: Partial<NavigationItem>): Promise<NavigationItem | undefined> {
+    const result = await db.update(navigationItemsTable)
+      .set(updates)
+      .where(eq(navigationItemsTable.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteNavigationItem(id: string): Promise<boolean> {
+    await db.delete(navigationItemsTable).where(eq(navigationItemsTable.id, id));
+    return true;
+  }
+
+  // Team members
+  async getTeamMember(id: string): Promise<TeamMember | undefined> {
+    const result = await db.select().from(teamMembersTable).where(eq(teamMembersTable.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getAllTeamMembers(): Promise<TeamMember[]> {
+    return db.select().from(teamMembersTable).orderBy(asc(teamMembersTable.displayOrder));
+  }
+
+  async createTeamMember(member: InsertTeamMember): Promise<TeamMember> {
+    const result = await db.insert(teamMembersTable).values(member).returning();
+    return result[0];
+  }
+
+  async updateTeamMember(id: string, updates: Partial<TeamMember>): Promise<TeamMember | undefined> {
+    const result = await db.update(teamMembersTable)
+      .set(updates)
+      .where(eq(teamMembersTable.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteTeamMember(id: string): Promise<boolean> {
+    await db.delete(teamMembersTable).where(eq(teamMembersTable.id, id));
+    return true;
+  }
+
+  // Media positions
+  async getMediaPosition(id: string): Promise<MediaPosition | undefined> {
+    const result = await db.select().from(mediaPositionsTable).where(eq(mediaPositionsTable.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getMediaPositionByKey(key: string): Promise<MediaPosition | undefined> {
+    const result = await db.select().from(mediaPositionsTable).where(eq(mediaPositionsTable.positionKey, key)).limit(1);
+    return result[0];
+  }
+
+  async getAllMediaPositions(): Promise<MediaPosition[]> {
+    return db.select().from(mediaPositionsTable).orderBy(asc(mediaPositionsTable.positionKey));
+  }
+
+  async createMediaPosition(position: InsertMediaPosition): Promise<MediaPosition> {
+    const result = await db.insert(mediaPositionsTable).values(position).returning();
+    return result[0];
+  }
+
+  async updateMediaPosition(id: string, updates: Partial<MediaPosition>): Promise<MediaPosition | undefined> {
+    const result = await db.update(mediaPositionsTable)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(mediaPositionsTable.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteMediaPosition(id: string): Promise<boolean> {
+    await db.delete(mediaPositionsTable).where(eq(mediaPositionsTable.id, id));
+    return true;
+  }
+
+  // Audit logs
+  async createAuditLog(log: Omit<AuditLog, "id" | "createdAt">): Promise<AuditLog> {
+    const result = await db.insert(auditLogsTable).values(log).returning();
+    return result[0];
+  }
+
+  async getAuditLogs(filters?: {
+    userId?: string;
+    action?: string;
+    resource?: string;
+    startDate?: Date;
+    endDate?: Date;
+    limit?: number;
+  }): Promise<AuditLog[]> {
+    let query = db.select().from(auditLogsTable);
+    
+    const conditions = [];
+    if (filters?.userId) conditions.push(eq(auditLogsTable.userId, filters.userId));
+    if (filters?.action) conditions.push(eq(auditLogsTable.action, filters.action));
+    if (filters?.resource) conditions.push(eq(auditLogsTable.resource, filters.resource));
+    if (filters?.startDate) conditions.push(drizzleSql`${auditLogsTable.createdAt} >= ${filters.startDate}`);
+    if (filters?.endDate) conditions.push(drizzleSql`${auditLogsTable.createdAt} <= ${filters.endDate}`);
+    
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as any;
+    }
+    
+    query = query.orderBy(desc(auditLogsTable.createdAt)) as any;
+    
+    if (filters?.limit) {
+      query = query.limit(filters.limit) as any;
+    }
+    
+    return query;
+  }
+
+  // System settings
+  async getSetting(key: string): Promise<SystemSetting | undefined> {
+    const result = await db.select().from(systemSettingsTable).where(eq(systemSettingsTable.key, key)).limit(1);
+    return result[0];
+  }
+
+  async getAllSettings(): Promise<SystemSetting[]> {
+    return db.select().from(systemSettingsTable);
+  }
+
+  async getSettingsByCategory(category: string): Promise<SystemSetting[]> {
+    return db.select().from(systemSettingsTable).where(eq(systemSettingsTable.category, category));
+  }
+
+  async upsertSetting(setting: InsertSystemSetting): Promise<SystemSetting> {
+    const result = await db.insert(systemSettingsTable)
+      .values({ ...setting, updatedAt: new Date() })
+      .onConflictDoUpdate({
+        target: systemSettingsTable.key,
+        set: { ...setting, updatedAt: new Date() }
+      })
+      .returning();
+    return result[0];
+  }
+
+  async deleteSetting(key: string): Promise<boolean> {
+    await db.delete(systemSettingsTable).where(eq(systemSettingsTable.key, key));
+    return true;
+  }
+
+  // Videos
+  async getVideo(id: string): Promise<VideoContent | undefined> {
+    const result = await db.select().from(videoContentTable).where(eq(videoContentTable.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getAllVideos(): Promise<VideoContent[]> {
+    return db.select().from(videoContentTable).orderBy(desc(videoContentTable.createdAt));
+  }
+
+  async getPublishedVideos(): Promise<VideoContent[]> {
+    return db.select().from(videoContentTable)
+      .where(eq(videoContentTable.isPublished, true))
+      .orderBy(desc(videoContentTable.createdAt));
+  }
+
+  async createVideo(video: InsertVideoContent): Promise<VideoContent> {
+    const result = await db.insert(videoContentTable).values(video).returning();
+    return result[0];
+  }
+
+  async updateVideo(id: string, updates: Partial<VideoContent>): Promise<VideoContent | undefined> {
+    const result = await db.update(videoContentTable)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(videoContentTable.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteVideo(id: string): Promise<boolean> {
+    await db.delete(videoContentTable).where(eq(videoContentTable.id, id));
+    return true;
+  }
+
+  // Additional helper methods
+  async getVisibleTeamMembers(): Promise<TeamMember[]> {
+    return db.select().from(teamMembersTable)
+      .where(eq(teamMembersTable.isVisible, true))
+      .orderBy(asc(teamMembersTable.displayOrder));
+  }
+
+  async getMediaPositionsByCategory(category: string): Promise<MediaPosition[]> {
+    return db.select().from(mediaPositionsTable)
+      .where(eq(mediaPositionsTable.category, category))
+      .orderBy(asc(mediaPositionsTable.positionKey));
+  }
+
+  async getActiveMediaPositions(): Promise<MediaPosition[]> {
+    return db.select().from(mediaPositionsTable)
+      .where(eq(mediaPositionsTable.isActive, true))
+      .orderBy(asc(mediaPositionsTable.positionKey));
+  }
+
+  // Stub implementations for methods not needed by init-admin or current features
+  // (These can be implemented later if needed)
+  async getContactById(id: string): Promise<Contact | null> {
+    const result = await db.select().from(contactsTable).where(eq(contactsTable.id, id)).limit(1);
+    return result[0] || null;
+  }
+  
+  async createTheme(settings: InsertThemeSettings): Promise<ThemeSettings> {
+    const result = await db.insert(themeSettingsTable).values(settings).returning();
+    return result[0];
+  }
+  
+  async updateTheme(id: string, updates: Partial<ThemeSettings>): Promise<ThemeSettings | undefined> {
+    const result = await db.update(themeSettingsTable)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(themeSettingsTable.id, id))
+      .returning();
+    return result[0];
+  }
+  
+  async deleteTheme(id: string): Promise<boolean> {
+    await db.delete(themeSettingsTable).where(eq(themeSettingsTable.id, id));
+    return true;
+  }
+  
+  async reorderContentSections(pageId: string, sectionOrders: { id: string; displayOrder: number }[]): Promise<boolean> {
+    throw new Error("Not implemented");
+  }
+  
+  async reorderContentBlocks(sectionId: string, blockOrders: { id: string; displayOrder: number }[]): Promise<boolean> {
+    throw new Error("Not implemented");
+  }
+  
+  async searchMediaAssets(query: string): Promise<MediaAsset[]> {
+    return [];
+  }
+  
+  async getNavigationTree(): Promise<NavigationItem[]> {
+    return this.getAllNavigationItems();
+  }
+  
+  async reorderNavigationItems(items: { id: string; displayOrder: number; parentId?: string }[]): Promise<boolean> {
+    throw new Error("Not implemented");
+  }
+  
+  async getContentNode(id: string): Promise<ContentNode | undefined> { throw new Error("Not implemented"); }
+  async getPageNodes(pageId: string): Promise<ContentNode[]> { return []; }
+  async createContentNode(node: InsertContentNode): Promise<ContentNode> { throw new Error("Not implemented"); }
+  async updateContentNode(id: string, updates: Partial<ContentNode>): Promise<ContentNode | undefined> { throw new Error("Not implemented"); }
+  async deleteContentNode(id: string): Promise<boolean> { throw new Error("Not implemented"); }
+  async reorderContentNodes(pageId: string, nodeOrders: { id: string; displayOrder: number }[]): Promise<boolean> { throw new Error("Not implemented"); }
+  async getContentSection(id: string): Promise<ContentSection | undefined> { throw new Error("Not implemented"); }
+  async getPageSections(pageId: string): Promise<ContentSection[]> { return []; }
+  async createContentSection(section: InsertContentSection): Promise<ContentSection> { throw new Error("Not implemented"); }
+  async updateContentSection(id: string, updates: Partial<ContentSection>): Promise<ContentSection | undefined> { throw new Error("Not implemented"); }
+  async deleteContentSection(id: string): Promise<boolean> { throw new Error("Not implemented"); }
+  async getContentBlock(id: string): Promise<ContentBlock | undefined> { throw new Error("Not implemented"); }
+  async getSectionBlocks(sectionId: string): Promise<ContentBlock[]> { return []; }
+  async createContentBlock(block: InsertContentBlock): Promise<ContentBlock> { throw new Error("Not implemented"); }
+  async updateContentBlock(id: string, updates: Partial<ContentBlock>): Promise<ContentBlock | undefined> { throw new Error("Not implemented"); }
+  async deleteContentBlock(id: string): Promise<boolean> { throw new Error("Not implemented"); }
+  async getMediaAsset(id: string): Promise<MediaAsset | undefined> { throw new Error("Not implemented"); }
+  async getAllMediaAssets(): Promise<MediaAsset[]> { return []; }
+  async createMediaAsset(asset: InsertMediaAsset): Promise<MediaAsset> { throw new Error("Not implemented"); }
+  async updateMediaAsset(id: string, updates: Partial<MediaAsset>): Promise<MediaAsset | undefined> { throw new Error("Not implemented"); }
+  async deleteMediaAsset(id: string): Promise<boolean> { throw new Error("Not implemented"); }
+  async getThemeSettings(id: string): Promise<ThemeSettings | undefined> { throw new Error("Not implemented"); }
+  async getActiveTheme(): Promise<ThemeSettings | undefined> { throw new Error("Not implemented"); }
+  async createThemeSettings(settings: InsertThemeSettings): Promise<ThemeSettings> { throw new Error("Not implemented"); }
+  async updateThemeSettings(id: string, updates: Partial<ThemeSettings>): Promise<ThemeSettings | undefined> { throw new Error("Not implemented"); }
+  async deleteThemeSettings(id: string): Promise<boolean> { throw new Error("Not implemented"); }
+  async activateTheme(id: string): Promise<ThemeSettings | undefined> { throw new Error("Not implemented"); }
+  async getAllThemes(): Promise<ThemeSettings[]> { return []; }
+  async getVideoContent(id: string): Promise<VideoContent | undefined> { throw new Error("Not implemented"); }
+  async getAllVideoContent(): Promise<VideoContent[]> { return []; }
+  async createVideoContent(video: InsertVideoContent): Promise<VideoContent> { throw new Error("Not implemented"); }
+  async updateVideoContent(id: string, updates: Partial<VideoContent>): Promise<VideoContent | undefined> { throw new Error("Not implemented"); }
+  async deleteVideoContent(id: string): Promise<boolean> { throw new Error("Not implemented"); }
+  async incrementVideoViews(id: string): Promise<void> {
+    await db.update(videoContentTable)
+      .set({ views: drizzleSql`${videoContentTable.views} + 1` })
+      .where(eq(videoContentTable.id, id));
+  }
+}
+
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private contacts: Map<string, Contact>;
@@ -1165,4 +1655,5 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Switch to PostgreSQL storage
+export const storage = new DbStorage();
