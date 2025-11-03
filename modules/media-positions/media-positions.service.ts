@@ -1,5 +1,5 @@
 import { storage } from "../../storage";
-import type { InsertMediaPosition, MediaPosition } from "@myhealthintegral/shared";
+import type { InsertMediaPosition, MediaPosition } from "@myhi2025/shared";
 import { notFound } from "../common/errorHandlers";
 
 export const mediaPositionsService = {
@@ -11,17 +11,19 @@ export const mediaPositionsService = {
     return await storage.getPublicMediaPositions();
   },
 
-  async getMediaPositionsByCategory(category: string): Promise<MediaPosition[]> {
+  async getMediaPositionsByCategory(
+    category: string
+  ): Promise<MediaPosition[]> {
     const allPositions = await storage.getAllMediaPositions();
-    return allPositions.filter(p => p.category === category);
+    return allPositions.filter((p) => p.category === category);
   },
 
   async getMediaPosition(id: string): Promise<MediaPosition | undefined> {
-    return await storage.getMediaPosition(id) || undefined;
+    return (await storage.getMediaPosition(id)) || undefined;
   },
 
   async getMediaPositionByKey(key: string): Promise<MediaPosition | undefined> {
-    return await storage.getMediaPositionByKey(key) || undefined;
+    return (await storage.getMediaPositionByKey(key)) || undefined;
   },
 
   async createMediaPosition(
@@ -73,9 +75,13 @@ export const mediaPositionsService = {
     return position;
   },
 
-  async deleteMediaPosition(id: string, userId: string, req: any): Promise<boolean> {
+  async deleteMediaPosition(
+    id: string,
+    userId: string,
+    req: any
+  ): Promise<boolean> {
     const position = await storage.getMediaPosition(id);
-    
+
     if (!position) {
       throw notFound("Media position", id);
     }

@@ -1,14 +1,14 @@
-import { contentRepository } from '../../repositories/implementations';
-import { logUserAction } from '../../auth';
-import { 
-  insertPageSchema, 
-  insertContentNodeSchema, 
-  insertContentSectionSchema, 
-  insertContentBlockSchema 
-} from '@myhealthintegral/shared';
-import { z } from 'zod';
-import { Request } from 'express';
-import { notFound, conflict } from '../common/errorHandlers';
+import { contentRepository } from "../../repositories/implementations";
+import { logUserAction } from "../../auth";
+import {
+  insertPageSchema,
+  insertContentNodeSchema,
+  insertContentSectionSchema,
+  insertContentBlockSchema,
+} from "@myhi2025/shared";
+import { z } from "zod";
+import { Request } from "express";
+import { notFound, conflict } from "../common/errorHandlers";
 
 export class CmsService {
   async getAllPublicPages() {
@@ -17,15 +17,15 @@ export class CmsService {
 
   async getPublicPageNodes(pageId: string) {
     const page = await contentRepository.findPageById(pageId);
-    
+
     if (!page) {
       throw notFound("Page", pageId);
     }
-    
+
     if (!page.isPublished) {
       throw { status: 403, message: "Page is not published" };
     }
-    
+
     return await contentRepository.getNodesByPageId(pageId);
   }
 
@@ -41,33 +41,53 @@ export class CmsService {
     return page;
   }
 
-  async createPage(data: z.infer<typeof insertPageSchema>, currentUserId: string, req: Request) {
+  async createPage(
+    data: z.infer<typeof insertPageSchema>,
+    currentUserId: string,
+    req: Request
+  ) {
     const existingPage = await contentRepository.findPageBySlug(data.slug);
     if (existingPage) {
       throw conflict("Page with this slug already exists");
     }
-    
+
     const newPage = await contentRepository.createPage(data);
-    
-    await logUserAction(currentUserId, "create", "pages", newPage.id, { page_title: newPage.title }, req);
-    
+
+    await logUserAction(
+      currentUserId,
+      "create",
+      "pages",
+      newPage.id,
+      { page_title: newPage.title },
+      req
+    );
+
     return newPage;
   }
 
   async updatePage(id: string, data: any, currentUserId: string, req: Request) {
     const updateData = { ...data, updatedBy: currentUserId };
-    
+
     if (updateData.slug) {
-      const existingPage = await contentRepository.findPageBySlug(updateData.slug);
+      const existingPage = await contentRepository.findPageBySlug(
+        updateData.slug
+      );
       if (existingPage && existingPage.id !== id) {
         throw conflict("Page with this slug already exists");
       }
     }
-    
+
     const updatedPage = await contentRepository.updatePage(id, updateData);
-    
-    await logUserAction(currentUserId, "update", "pages", id, { page_title: updatedPage.title }, req);
-    
+
+    await logUserAction(
+      currentUserId,
+      "update",
+      "pages",
+      id,
+      { page_title: updatedPage.title },
+      req
+    );
+
     return updatedPage;
   }
 
@@ -76,25 +96,44 @@ export class CmsService {
     if (!page) {
       throw notFound("Page", id);
     }
-    
+
     await contentRepository.deletePage(id);
-    
-    await logUserAction(currentUserId, "delete", "pages", id, { page_title: page.title }, req);
-    
+
+    await logUserAction(
+      currentUserId,
+      "delete",
+      "pages",
+      id,
+      { page_title: page.title },
+      req
+    );
+
     return { message: "Page deleted successfully" };
   }
 
-  async publishPage(id: string, isPublished: boolean, currentUserId: string, req: Request) {
+  async publishPage(
+    id: string,
+    isPublished: boolean,
+    currentUserId: string,
+    req: Request
+  ) {
     const updatedPage = await contentRepository.updatePage(id, {
       isPublished,
       publishedAt: isPublished ? new Date() : null,
       updatedBy: currentUserId,
     });
-    
-    await logUserAction(currentUserId, isPublished ? "publish" : "unpublish", "pages", id, { 
-      page_title: updatedPage.title 
-    }, req);
-    
+
+    await logUserAction(
+      currentUserId,
+      isPublished ? "publish" : "unpublish",
+      "pages",
+      id,
+      {
+        page_title: updatedPage.title,
+      },
+      req
+    );
+
     return updatedPage;
   }
 
@@ -102,14 +141,25 @@ export class CmsService {
     return await contentRepository.getNodesByPageId(pageId);
   }
 
-  async createNode(data: z.infer<typeof insertContentNodeSchema>, currentUserId: string, req: Request) {
+  async createNode(
+    data: z.infer<typeof insertContentNodeSchema>,
+    currentUserId: string,
+    req: Request
+  ) {
     const newNode = await contentRepository.createNode(data);
-    
-    await logUserAction(currentUserId, "create", "content", newNode.id, { 
-      node_type: newNode.nodeType, 
-      page_id: newNode.pageId 
-    }, req);
-    
+
+    await logUserAction(
+      currentUserId,
+      "create",
+      "content",
+      newNode.id,
+      {
+        node_type: newNode.nodeType,
+        page_id: newNode.pageId,
+      },
+      req
+    );
+
     return newNode;
   }
 
@@ -123,19 +173,26 @@ export class CmsService {
 
   async updateNode(id: string, data: any, currentUserId: string, req: Request) {
     const updatedNode = await contentRepository.updateNode(id, data);
-    
-    await logUserAction(currentUserId, "update", "content", id, { 
-      node_type: updatedNode.nodeType 
-    }, req);
-    
+
+    await logUserAction(
+      currentUserId,
+      "update",
+      "content",
+      id,
+      {
+        node_type: updatedNode.nodeType,
+      },
+      req
+    );
+
     return updatedNode;
   }
 
   async deleteNode(id: string, currentUserId: string, req: Request) {
     await contentRepository.deleteNode(id);
-    
+
     await logUserAction(currentUserId, "delete", "content", id, {}, req);
-    
+
     return null;
   }
 
@@ -143,7 +200,7 @@ export class CmsService {
     if (!Array.isArray(nodeOrders)) {
       throw { status: 400, message: "nodeOrders must be an array" };
     }
-    
+
     return { message: "Nodes reordered successfully" };
   }
 
@@ -157,24 +214,47 @@ export class CmsService {
     return sections;
   }
 
-  async createSection(data: z.infer<typeof insertContentSectionSchema>, currentUserId: string, req: Request) {
+  async createSection(
+    data: z.infer<typeof insertContentSectionSchema>,
+    currentUserId: string,
+    req: Request
+  ) {
     const newSection = await contentRepository.createSection(data);
-    
-    await logUserAction(currentUserId, "create", "content", newSection.id, { 
-      section_type: newSection.sectionType, 
-      page_id: newSection.pageId 
-    }, req);
-    
+
+    await logUserAction(
+      currentUserId,
+      "create",
+      "content",
+      newSection.id,
+      {
+        section_type: newSection.sectionType,
+        page_id: newSection.pageId,
+      },
+      req
+    );
+
     return newSection;
   }
 
-  async updateSection(id: string, data: any, currentUserId: string, req: Request) {
+  async updateSection(
+    id: string,
+    data: any,
+    currentUserId: string,
+    req: Request
+  ) {
     const updatedSection = await contentRepository.updateSection(id, data);
-    
-    await logUserAction(currentUserId, "update", "content", id, { 
-      section_type: updatedSection.sectionType 
-    }, req);
-    
+
+    await logUserAction(
+      currentUserId,
+      "update",
+      "content",
+      id,
+      {
+        section_type: updatedSection.sectionType,
+      },
+      req
+    );
+
     return updatedSection;
   }
 
@@ -183,22 +263,41 @@ export class CmsService {
     if (!section) {
       throw notFound("Section", id);
     }
-    
+
     await contentRepository.deleteSection(id);
-    
-    await logUserAction(currentUserId, "delete", "content", id, { 
-      section_type: section.sectionType 
-    }, req);
-    
+
+    await logUserAction(
+      currentUserId,
+      "delete",
+      "content",
+      id,
+      {
+        section_type: section.sectionType,
+      },
+      req
+    );
+
     return { message: "Section deleted successfully" };
   }
 
-  async reorderSections(pageId: string, sectionOrders: any[], currentUserId: string, req: Request) {
-    await logUserAction(currentUserId, "reorder", "content", pageId, { 
-      action: "reorder_sections", 
-      count: sectionOrders.length 
-    }, req);
-    
+  async reorderSections(
+    pageId: string,
+    sectionOrders: any[],
+    currentUserId: string,
+    req: Request
+  ) {
+    await logUserAction(
+      currentUserId,
+      "reorder",
+      "content",
+      pageId,
+      {
+        action: "reorder_sections",
+        count: sectionOrders.length,
+      },
+      req
+    );
+
     return { message: "Sections reordered successfully" };
   }
 
@@ -206,24 +305,47 @@ export class CmsService {
     return await contentRepository.getBlocksBySectionId(sectionId);
   }
 
-  async createBlock(data: z.infer<typeof insertContentBlockSchema>, currentUserId: string, req: Request) {
+  async createBlock(
+    data: z.infer<typeof insertContentBlockSchema>,
+    currentUserId: string,
+    req: Request
+  ) {
     const newBlock = await contentRepository.createBlock(data);
-    
-    await logUserAction(currentUserId, "create", "content", newBlock.id, { 
-      block_type: newBlock.blockType, 
-      section_id: newBlock.sectionId 
-    }, req);
-    
+
+    await logUserAction(
+      currentUserId,
+      "create",
+      "content",
+      newBlock.id,
+      {
+        block_type: newBlock.blockType,
+        section_id: newBlock.sectionId,
+      },
+      req
+    );
+
     return newBlock;
   }
 
-  async updateBlock(id: string, data: any, currentUserId: string, req: Request) {
+  async updateBlock(
+    id: string,
+    data: any,
+    currentUserId: string,
+    req: Request
+  ) {
     const updatedBlock = await contentRepository.updateBlock(id, data);
-    
-    await logUserAction(currentUserId, "update", "content", id, { 
-      block_type: updatedBlock.blockType 
-    }, req);
-    
+
+    await logUserAction(
+      currentUserId,
+      "update",
+      "content",
+      id,
+      {
+        block_type: updatedBlock.blockType,
+      },
+      req
+    );
+
     return updatedBlock;
   }
 
@@ -232,22 +354,41 @@ export class CmsService {
     if (!block) {
       throw notFound("Block", id);
     }
-    
+
     await contentRepository.deleteBlock(id);
-    
-    await logUserAction(currentUserId, "delete", "content", id, { 
-      block_type: block.blockType 
-    }, req);
-    
+
+    await logUserAction(
+      currentUserId,
+      "delete",
+      "content",
+      id,
+      {
+        block_type: block.blockType,
+      },
+      req
+    );
+
     return { message: "Block deleted successfully" };
   }
 
-  async reorderBlocks(sectionId: string, blockOrders: any[], currentUserId: string, req: Request) {
-    await logUserAction(currentUserId, "reorder", "content", sectionId, { 
-      action: "reorder_blocks", 
-      count: blockOrders.length 
-    }, req);
-    
+  async reorderBlocks(
+    sectionId: string,
+    blockOrders: any[],
+    currentUserId: string,
+    req: Request
+  ) {
+    await logUserAction(
+      currentUserId,
+      "reorder",
+      "content",
+      sectionId,
+      {
+        action: "reorder_blocks",
+        count: blockOrders.length,
+      },
+      req
+    );
+
     return { message: "Blocks reordered successfully" };
   }
 
@@ -257,7 +398,7 @@ export class CmsService {
     if (!page) {
       throw notFound("Page", pageId);
     }
-    
+
     return await contentRepository.getPageVersions(pageId);
   }
 
@@ -266,18 +407,34 @@ export class CmsService {
     if (!version) {
       throw notFound("PageVersion", versionId);
     }
-    
+
     return version;
   }
 
-  async restoreVersion(pageId: string, versionId: string, currentUserId: string, req: Request) {
-    const restoredPage = await contentRepository.restorePageVersion(pageId, versionId, currentUserId);
-    
-    await logUserAction(currentUserId, "restore", "pages", pageId, { 
-      version_id: versionId,
-      page_title: restoredPage.title 
-    }, req);
-    
+  async restoreVersion(
+    pageId: string,
+    versionId: string,
+    currentUserId: string,
+    req: Request
+  ) {
+    const restoredPage = await contentRepository.restorePageVersion(
+      pageId,
+      versionId,
+      currentUserId
+    );
+
+    await logUserAction(
+      currentUserId,
+      "restore",
+      "pages",
+      pageId,
+      {
+        version_id: versionId,
+        page_title: restoredPage.title,
+      },
+      req
+    );
+
     return restoredPage;
   }
 

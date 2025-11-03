@@ -1,8 +1,8 @@
-import { mediaRepository } from '../../repositories/implementations';
-import { logUserAction } from '../../auth';
-import { Request } from 'express';
-import type { InsertVideoContent } from '@myhealthintegral/shared';
-import { notFound } from '../common/errorHandlers';
+import { mediaRepository } from "../../repositories/implementations";
+import { logUserAction } from "../../auth";
+import { Request } from "express";
+import type { InsertVideoContent } from "@myhi2025/shared";
+import { notFound } from "../common/errorHandlers";
 
 export class VideosService {
   async getAllVideos() {
@@ -21,31 +21,54 @@ export class VideosService {
     return video;
   }
 
-  async createVideo(data: InsertVideoContent, currentUserId: string, req: Request) {
+  async createVideo(
+    data: InsertVideoContent,
+    currentUserId: string,
+    req: Request
+  ) {
     const newVideo = await mediaRepository.createVideo({
       ...data,
       createdBy: currentUserId,
       updatedBy: currentUserId,
     });
-    
-    await logUserAction(currentUserId, "create", "video", newVideo.id, { 
-      video_title: newVideo.title,
-      category: newVideo.category
-    }, req);
-    
+
+    await logUserAction(
+      currentUserId,
+      "create",
+      "video",
+      newVideo.id,
+      {
+        video_title: newVideo.title,
+        category: newVideo.category,
+      },
+      req
+    );
+
     return newVideo;
   }
 
-  async updateVideo(id: string, data: Partial<InsertVideoContent>, currentUserId: string, req: Request) {
+  async updateVideo(
+    id: string,
+    data: Partial<InsertVideoContent>,
+    currentUserId: string,
+    req: Request
+  ) {
     const updatedVideo = await mediaRepository.updateVideo(id, {
       ...data,
       updatedBy: currentUserId,
     });
-    
-    await logUserAction(currentUserId, "update", "video", id, { 
-      video_title: updatedVideo.title
-    }, req);
-    
+
+    await logUserAction(
+      currentUserId,
+      "update",
+      "video",
+      id,
+      {
+        video_title: updatedVideo.title,
+      },
+      req
+    );
+
     return updatedVideo;
   }
 
@@ -54,13 +77,20 @@ export class VideosService {
     if (!video) {
       throw notFound("Video", id);
     }
-    
+
     await mediaRepository.deleteVideo(id);
-    
-    await logUserAction(currentUserId, "delete", "video", id, { 
-      video_title: video.title
-    }, req);
-    
+
+    await logUserAction(
+      currentUserId,
+      "delete",
+      "video",
+      id,
+      {
+        video_title: video.title,
+      },
+      req
+    );
+
     return { message: "Video deleted successfully" };
   }
 

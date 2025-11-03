@@ -1,16 +1,36 @@
 import {
-  type User, type InsertUser, type Contact, type InsertContact,
-  type Role, type InsertRole, type UserRole, type AdminSession,
-  type Page, type InsertPage, type ContentSection, type InsertContentSection,
-  type ContentNode, type InsertContentNode,
-  type ContentBlock, type InsertContentBlock, type MediaAsset, type InsertMediaAsset,
-  type NavigationItem, type InsertNavigationItem, type ThemeSettings, type InsertThemeSettings,
-  type TeamMember, type InsertTeamMember,
-  type MediaPosition, type InsertMediaPosition,
-  type VideoContent, type InsertVideoContent,
+  type User,
+  type InsertUser,
+  type Contact,
+  type InsertContact,
+  type Role,
+  type InsertRole,
+  type UserRole,
+  type AdminSession,
+  type Page,
+  type InsertPage,
+  type ContentSection,
+  type InsertContentSection,
+  type ContentNode,
+  type InsertContentNode,
+  type ContentBlock,
+  type InsertContentBlock,
+  type MediaAsset,
+  type InsertMediaAsset,
+  type NavigationItem,
+  type InsertNavigationItem,
+  type ThemeSettings,
+  type InsertThemeSettings,
+  type TeamMember,
+  type InsertTeamMember,
+  type MediaPosition,
+  type InsertMediaPosition,
+  type VideoContent,
+  type InsertVideoContent,
   type AuditLog,
-  type SystemSetting, type InsertSystemSetting
-} from "@myhealthintegral/shared";
+  type SystemSetting,
+  type InsertSystemSetting,
+} from "@myhi2025/shared";
 import { randomUUID } from "crypto";
 
 // modify the interface with any CRUD methods
@@ -38,7 +58,11 @@ export interface IStorage {
   removeUserRole(userId: string, roleId: string): Promise<boolean>;
 
   // Admin sessions
-  createSession(userId: string, token: string, expiresAt: Date): Promise<AdminSession>;
+  createSession(
+    userId: string,
+    token: string,
+    expiresAt: Date
+  ): Promise<AdminSession>;
   getSession(token: string): Promise<AdminSession | undefined>;
   deleteSession(token: string): Promise<boolean>;
   deleteUserSessions(userId: string): Promise<boolean>;
@@ -62,30 +86,51 @@ export interface IStorage {
   getContentNode(id: string): Promise<ContentNode | undefined>;
   getPageNodes(pageId: string): Promise<ContentNode[]>;
   createContentNode(node: InsertContentNode): Promise<ContentNode>;
-  updateContentNode(id: string, updates: Partial<ContentNode>): Promise<ContentNode | undefined>;
+  updateContentNode(
+    id: string,
+    updates: Partial<ContentNode>
+  ): Promise<ContentNode | undefined>;
   deleteContentNode(id: string): Promise<boolean>;
-  reorderContentNodes(pageId: string, nodeOrders: { id: string; displayOrder: number }[]): Promise<boolean>;
+  reorderContentNodes(
+    pageId: string,
+    nodeOrders: { id: string; displayOrder: number }[]
+  ): Promise<boolean>;
   getPagesByType(pageType: string): Promise<Page[]>;
 
   // Content Sections (legacy - keeping for backward compatibility)
   getContentSection(id: string): Promise<ContentSection | undefined>;
   getPageSections(pageId: string): Promise<ContentSection[]>;
   createContentSection(section: InsertContentSection): Promise<ContentSection>;
-  updateContentSection(id: string, updates: Partial<ContentSection>): Promise<ContentSection | undefined>;
+  updateContentSection(
+    id: string,
+    updates: Partial<ContentSection>
+  ): Promise<ContentSection | undefined>;
   deleteContentSection(id: string): Promise<boolean>;
-  reorderContentSections(pageId: string, sectionOrders: { id: string; displayOrder: number }[]): Promise<boolean>;
+  reorderContentSections(
+    pageId: string,
+    sectionOrders: { id: string; displayOrder: number }[]
+  ): Promise<boolean>;
 
   getContentBlock(id: string): Promise<ContentBlock | undefined>;
   getSectionBlocks(sectionId: string): Promise<ContentBlock[]>;
   createContentBlock(block: InsertContentBlock): Promise<ContentBlock>;
-  updateContentBlock(id: string, updates: Partial<ContentBlock>): Promise<ContentBlock | undefined>;
+  updateContentBlock(
+    id: string,
+    updates: Partial<ContentBlock>
+  ): Promise<ContentBlock | undefined>;
   deleteContentBlock(id: string): Promise<boolean>;
-  reorderContentBlocks(sectionId: string, blockOrders: { id: string; displayOrder: number }[]): Promise<boolean>;
+  reorderContentBlocks(
+    sectionId: string,
+    blockOrders: { id: string; displayOrder: number }[]
+  ): Promise<boolean>;
 
   // Media management
   getMediaAsset(id: string): Promise<MediaAsset | undefined>;
   createMediaAsset(asset: InsertMediaAsset): Promise<MediaAsset>;
-  updateMediaAsset(id: string, updates: Partial<MediaAsset>): Promise<MediaAsset | undefined>;
+  updateMediaAsset(
+    id: string,
+    updates: Partial<MediaAsset>
+  ): Promise<MediaAsset | undefined>;
   deleteMediaAsset(id: string): Promise<boolean>;
   getAllMediaAssets(): Promise<MediaAsset[]>;
   searchMediaAssets(query: string): Promise<MediaAsset[]>;
@@ -93,17 +138,25 @@ export interface IStorage {
   // Navigation management
   getNavigationItem(id: string): Promise<NavigationItem | undefined>;
   createNavigationItem(item: InsertNavigationItem): Promise<NavigationItem>;
-  updateNavigationItem(id: string, updates: Partial<NavigationItem>): Promise<NavigationItem | undefined>;
+  updateNavigationItem(
+    id: string,
+    updates: Partial<NavigationItem>
+  ): Promise<NavigationItem | undefined>;
   deleteNavigationItem(id: string): Promise<boolean>;
   getAllNavigationItems(): Promise<NavigationItem[]>;
   getNavigationTree(): Promise<NavigationItem[]>;
-  reorderNavigationItems(itemOrders: { id: string; displayOrder: number }[]): Promise<boolean>;
+  reorderNavigationItems(
+    itemOrders: { id: string; displayOrder: number }[]
+  ): Promise<boolean>;
 
   // Theme management
   getThemeSettings(id: string): Promise<ThemeSettings | undefined>;
   getActiveTheme(): Promise<ThemeSettings | undefined>;
   createThemeSettings(theme: InsertThemeSettings): Promise<ThemeSettings>;
-  updateThemeSettings(id: string, updates: Partial<ThemeSettings>): Promise<ThemeSettings | undefined>;
+  updateThemeSettings(
+    id: string,
+    updates: Partial<ThemeSettings>
+  ): Promise<ThemeSettings | undefined>;
   deleteThemeSettings(id: string): Promise<boolean>;
   getAllThemes(): Promise<ThemeSettings[]>;
   activateTheme(id: string): Promise<ThemeSettings | undefined>;
@@ -111,7 +164,10 @@ export interface IStorage {
   // Team member management
   getTeamMember(id: string): Promise<TeamMember | undefined>;
   createTeamMember(member: InsertTeamMember): Promise<TeamMember>;
-  updateTeamMember(id: string, updates: Partial<TeamMember>): Promise<TeamMember | undefined>;
+  updateTeamMember(
+    id: string,
+    updates: Partial<TeamMember>
+  ): Promise<TeamMember | undefined>;
   deleteTeamMember(id: string): Promise<boolean>;
   getAllTeamMembers(): Promise<TeamMember[]>;
   getVisibleTeamMembers(): Promise<TeamMember[]>;
@@ -120,7 +176,10 @@ export interface IStorage {
   getMediaPosition(id: string): Promise<MediaPosition | undefined>;
   getMediaPositionByKey(key: string): Promise<MediaPosition | undefined>;
   createMediaPosition(position: InsertMediaPosition): Promise<MediaPosition>;
-  updateMediaPosition(id: string, updates: Partial<MediaPosition>): Promise<MediaPosition | undefined>;
+  updateMediaPosition(
+    id: string,
+    updates: Partial<MediaPosition>
+  ): Promise<MediaPosition | undefined>;
   deleteMediaPosition(id: string): Promise<boolean>;
   getAllMediaPositions(): Promise<MediaPosition[]>;
   getMediaPositionsByCategory(category: string): Promise<MediaPosition[]>;
@@ -129,14 +188,22 @@ export interface IStorage {
   // Video content management
   getVideo(id: string): Promise<VideoContent | undefined>;
   createVideo(video: InsertVideoContent): Promise<VideoContent>;
-  updateVideo(id: string, updates: Partial<VideoContent>): Promise<VideoContent | undefined>;
+  updateVideo(
+    id: string,
+    updates: Partial<VideoContent>
+  ): Promise<VideoContent | undefined>;
   deleteVideo(id: string): Promise<boolean>;
   getAllVideos(): Promise<VideoContent[]>;
   getPublishedVideos(): Promise<VideoContent[]>;
 
   // Audit logging
-  createAuditLog(log: Omit<AuditLog, 'id' | 'createdAt'>): Promise<AuditLog>;
-  getAuditLogs(filters?: { userId?: string; resource?: string; action?: string; limit?: number }): Promise<AuditLog[]>;
+  createAuditLog(log: Omit<AuditLog, "id" | "createdAt">): Promise<AuditLog>;
+  getAuditLogs(filters?: {
+    userId?: string;
+    resource?: string;
+    action?: string;
+    limit?: number;
+  }): Promise<AuditLog[]>;
 
   // System settings
   getSetting(key: string): Promise<SystemSetting | undefined>;
@@ -149,31 +216,52 @@ export interface IStorage {
 // PostgreSQL Storage Implementation
 import { db } from "./db";
 import { eq, and, desc, asc, sql as drizzleSql } from "drizzle-orm";
-import { 
-  users as usersTable, roles as rolesTable, userRoles as userRolesTable,
-  adminSessions as adminSessionsTable, contacts as contactsTable,
-  pages as pagesTable, contentNodes as contentNodesTable,
-  contentSections as contentSectionsTable, contentBlocks as contentBlocksTable,
-  mediaAssets as mediaAssetsTable, navigationItems as navigationItemsTable,
-  themeSettings as themeSettingsTable, teamMembers as teamMembersTable,
-  mediaPositions as mediaPositionsTable, videoContent as videoContentTable,
-  auditLogs as auditLogsTable, systemSettings as systemSettingsTable
-} from "@myhealthintegral/shared";
+import {
+  users as usersTable,
+  roles as rolesTable,
+  userRoles as userRolesTable,
+  adminSessions as adminSessionsTable,
+  contacts as contactsTable,
+  pages as pagesTable,
+  contentNodes as contentNodesTable,
+  contentSections as contentSectionsTable,
+  contentBlocks as contentBlocksTable,
+  mediaAssets as mediaAssetsTable,
+  navigationItems as navigationItemsTable,
+  themeSettings as themeSettingsTable,
+  teamMembers as teamMembersTable,
+  mediaPositions as mediaPositionsTable,
+  videoContent as videoContentTable,
+  auditLogs as auditLogsTable,
+  systemSettings as systemSettingsTable,
+} from "@myhi2025/shared";
 
 export class DbStorage implements IStorage {
   // User management
   async getUser(id: string): Promise<User | undefined> {
-    const result = await db.select().from(usersTable).where(eq(usersTable.id, id)).limit(1);
+    const result = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.id, id))
+      .limit(1);
     return result[0];
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const result = await db.select().from(usersTable).where(eq(usersTable.username, username)).limit(1);
+    const result = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.username, username))
+      .limit(1);
     return result[0];
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const result = await db.select().from(usersTable).where(eq(usersTable.email, email)).limit(1);
+    const result = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.email, email))
+      .limit(1);
     return result[0];
   }
 
@@ -182,8 +270,12 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
-  async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
-    const result = await db.update(usersTable)
+  async updateUser(
+    id: string,
+    updates: Partial<User>
+  ): Promise<User | undefined> {
+    const result = await db
+      .update(usersTable)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(usersTable.id, id))
       .returning();
@@ -201,12 +293,20 @@ export class DbStorage implements IStorage {
 
   // Roles and permissions
   async getRole(id: string): Promise<Role | undefined> {
-    const result = await db.select().from(rolesTable).where(eq(rolesTable.id, id)).limit(1);
+    const result = await db
+      .select()
+      .from(rolesTable)
+      .where(eq(rolesTable.id, id))
+      .limit(1);
     return result[0];
   }
 
   async getRoleByName(name: string): Promise<Role | undefined> {
-    const result = await db.select().from(rolesTable).where(eq(rolesTable.name, name)).limit(1);
+    const result = await db
+      .select()
+      .from(rolesTable)
+      .where(eq(rolesTable.name, name))
+      .limit(1);
     return result[0];
   }
 
@@ -215,8 +315,12 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
-  async updateRole(id: string, updates: Partial<Role>): Promise<Role | undefined> {
-    const result = await db.update(rolesTable)
+  async updateRole(
+    id: string,
+    updates: Partial<Role>
+  ): Promise<Role | undefined> {
+    const result = await db
+      .update(rolesTable)
       .set(updates)
       .where(eq(rolesTable.id, id))
       .returning();
@@ -233,42 +337,65 @@ export class DbStorage implements IStorage {
   }
 
   async getUserRoles(userId: string): Promise<UserRole[]> {
-    return db.select().from(userRolesTable).where(eq(userRolesTable.userId, userId));
+    return db
+      .select()
+      .from(userRolesTable)
+      .where(eq(userRolesTable.userId, userId));
   }
 
   async assignUserRole(userId: string, roleId: string): Promise<UserRole> {
-    const result = await db.insert(userRolesTable)
+    const result = await db
+      .insert(userRolesTable)
       .values({ userId, roleId })
       .returning();
     return result[0];
   }
 
   async removeUserRole(userId: string, roleId: string): Promise<boolean> {
-    await db.delete(userRolesTable)
-      .where(and(eq(userRolesTable.userId, userId), eq(userRolesTable.roleId, roleId)));
+    await db
+      .delete(userRolesTable)
+      .where(
+        and(
+          eq(userRolesTable.userId, userId),
+          eq(userRolesTable.roleId, roleId)
+        )
+      );
     return true;
   }
 
   // Admin sessions
-  async createSession(userId: string, token: string, expiresAt: Date): Promise<AdminSession> {
-    const result = await db.insert(adminSessionsTable)
+  async createSession(
+    userId: string,
+    token: string,
+    expiresAt: Date
+  ): Promise<AdminSession> {
+    const result = await db
+      .insert(adminSessionsTable)
       .values({ userId, token, expiresAt })
       .returning();
     return result[0];
   }
 
   async getSession(token: string): Promise<AdminSession | undefined> {
-    const result = await db.select().from(adminSessionsTable).where(eq(adminSessionsTable.token, token)).limit(1);
+    const result = await db
+      .select()
+      .from(adminSessionsTable)
+      .where(eq(adminSessionsTable.token, token))
+      .limit(1);
     return result[0];
   }
 
   async deleteSession(token: string): Promise<boolean> {
-    await db.delete(adminSessionsTable).where(eq(adminSessionsTable.token, token));
+    await db
+      .delete(adminSessionsTable)
+      .where(eq(adminSessionsTable.token, token));
     return true;
   }
 
   async deleteUserSessions(userId: string): Promise<boolean> {
-    await db.delete(adminSessionsTable).where(eq(adminSessionsTable.userId, userId));
+    await db
+      .delete(adminSessionsTable)
+      .where(eq(adminSessionsTable.userId, userId));
     return true;
   }
 
@@ -279,17 +406,28 @@ export class DbStorage implements IStorage {
   }
 
   async getAllContacts(): Promise<Contact[]> {
-    return db.select().from(contactsTable).orderBy(desc(contactsTable.createdAt));
+    return db
+      .select()
+      .from(contactsTable)
+      .orderBy(desc(contactsTable.createdAt));
   }
 
   // Page management
   async getPage(id: string): Promise<Page | undefined> {
-    const result = await db.select().from(pagesTable).where(eq(pagesTable.id, id)).limit(1);
+    const result = await db
+      .select()
+      .from(pagesTable)
+      .where(eq(pagesTable.id, id))
+      .limit(1);
     return result[0];
   }
 
   async getPageBySlug(slug: string): Promise<Page | undefined> {
-    const result = await db.select().from(pagesTable).where(eq(pagesTable.slug, slug)).limit(1);
+    const result = await db
+      .select()
+      .from(pagesTable)
+      .where(eq(pagesTable.slug, slug))
+      .limit(1);
     return result[0];
   }
 
@@ -298,8 +436,12 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
-  async updatePage(id: string, updates: Partial<Page>): Promise<Page | undefined> {
-    const result = await db.update(pagesTable)
+  async updatePage(
+    id: string,
+    updates: Partial<Page>
+  ): Promise<Page | undefined> {
+    const result = await db
+      .update(pagesTable)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(pagesTable.id, id))
       .returning();
@@ -316,21 +458,30 @@ export class DbStorage implements IStorage {
   }
 
   async getPublishedPages(): Promise<Page[]> {
-    return db.select().from(pagesTable)
+    return db
+      .select()
+      .from(pagesTable)
       .where(eq(pagesTable.isPublished, true))
       .orderBy(desc(pagesTable.publishedAt));
   }
 
   async publishPage(id: string, userId: string): Promise<Page | undefined> {
-    const result = await db.update(pagesTable)
-      .set({ isPublished: true, publishedAt: new Date(), updatedBy: userId, updatedAt: new Date() })
+    const result = await db
+      .update(pagesTable)
+      .set({
+        isPublished: true,
+        publishedAt: new Date(),
+        updatedBy: userId,
+        updatedAt: new Date(),
+      })
       .where(eq(pagesTable.id, id))
       .returning();
     return result[0];
   }
 
   async unpublishPage(id: string): Promise<Page | undefined> {
-    const result = await db.update(pagesTable)
+    const result = await db
+      .update(pagesTable)
       .set({ isPublished: false, updatedAt: new Date() })
       .where(eq(pagesTable.id, id))
       .returning();
@@ -338,28 +489,46 @@ export class DbStorage implements IStorage {
   }
 
   async getPagesByType(pageType: string): Promise<Page[]> {
-    return db.select().from(pagesTable)
+    return db
+      .select()
+      .from(pagesTable)
       .where(eq(pagesTable.pageType, pageType))
       .orderBy(desc(pagesTable.createdAt));
   }
 
   // Navigation items
   async getNavigationItem(id: string): Promise<NavigationItem | undefined> {
-    const result = await db.select().from(navigationItemsTable).where(eq(navigationItemsTable.id, id)).limit(1);
+    const result = await db
+      .select()
+      .from(navigationItemsTable)
+      .where(eq(navigationItemsTable.id, id))
+      .limit(1);
     return result[0];
   }
 
   async getAllNavigationItems(): Promise<NavigationItem[]> {
-    return db.select().from(navigationItemsTable).orderBy(asc(navigationItemsTable.displayOrder));
+    return db
+      .select()
+      .from(navigationItemsTable)
+      .orderBy(asc(navigationItemsTable.displayOrder));
   }
 
-  async createNavigationItem(item: InsertNavigationItem): Promise<NavigationItem> {
-    const result = await db.insert(navigationItemsTable).values(item).returning();
+  async createNavigationItem(
+    item: InsertNavigationItem
+  ): Promise<NavigationItem> {
+    const result = await db
+      .insert(navigationItemsTable)
+      .values(item)
+      .returning();
     return result[0];
   }
 
-  async updateNavigationItem(id: string, updates: Partial<NavigationItem>): Promise<NavigationItem | undefined> {
-    const result = await db.update(navigationItemsTable)
+  async updateNavigationItem(
+    id: string,
+    updates: Partial<NavigationItem>
+  ): Promise<NavigationItem | undefined> {
+    const result = await db
+      .update(navigationItemsTable)
       .set(updates)
       .where(eq(navigationItemsTable.id, id))
       .returning();
@@ -367,18 +536,27 @@ export class DbStorage implements IStorage {
   }
 
   async deleteNavigationItem(id: string): Promise<boolean> {
-    await db.delete(navigationItemsTable).where(eq(navigationItemsTable.id, id));
+    await db
+      .delete(navigationItemsTable)
+      .where(eq(navigationItemsTable.id, id));
     return true;
   }
 
   // Team members
   async getTeamMember(id: string): Promise<TeamMember | undefined> {
-    const result = await db.select().from(teamMembersTable).where(eq(teamMembersTable.id, id)).limit(1);
+    const result = await db
+      .select()
+      .from(teamMembersTable)
+      .where(eq(teamMembersTable.id, id))
+      .limit(1);
     return result[0];
   }
 
   async getAllTeamMembers(): Promise<TeamMember[]> {
-    return db.select().from(teamMembersTable).orderBy(asc(teamMembersTable.displayOrder));
+    return db
+      .select()
+      .from(teamMembersTable)
+      .orderBy(asc(teamMembersTable.displayOrder));
   }
 
   async createTeamMember(member: InsertTeamMember): Promise<TeamMember> {
@@ -386,8 +564,12 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
-  async updateTeamMember(id: string, updates: Partial<TeamMember>): Promise<TeamMember | undefined> {
-    const result = await db.update(teamMembersTable)
+  async updateTeamMember(
+    id: string,
+    updates: Partial<TeamMember>
+  ): Promise<TeamMember | undefined> {
+    const result = await db
+      .update(teamMembersTable)
       .set(updates)
       .where(eq(teamMembersTable.id, id))
       .returning();
@@ -401,26 +583,46 @@ export class DbStorage implements IStorage {
 
   // Media positions
   async getMediaPosition(id: string): Promise<MediaPosition | undefined> {
-    const result = await db.select().from(mediaPositionsTable).where(eq(mediaPositionsTable.id, id)).limit(1);
+    const result = await db
+      .select()
+      .from(mediaPositionsTable)
+      .where(eq(mediaPositionsTable.id, id))
+      .limit(1);
     return result[0];
   }
 
   async getMediaPositionByKey(key: string): Promise<MediaPosition | undefined> {
-    const result = await db.select().from(mediaPositionsTable).where(eq(mediaPositionsTable.positionKey, key)).limit(1);
+    const result = await db
+      .select()
+      .from(mediaPositionsTable)
+      .where(eq(mediaPositionsTable.positionKey, key))
+      .limit(1);
     return result[0];
   }
 
   async getAllMediaPositions(): Promise<MediaPosition[]> {
-    return db.select().from(mediaPositionsTable).orderBy(asc(mediaPositionsTable.positionKey));
+    return db
+      .select()
+      .from(mediaPositionsTable)
+      .orderBy(asc(mediaPositionsTable.positionKey));
   }
 
-  async createMediaPosition(position: InsertMediaPosition): Promise<MediaPosition> {
-    const result = await db.insert(mediaPositionsTable).values(position).returning();
+  async createMediaPosition(
+    position: InsertMediaPosition
+  ): Promise<MediaPosition> {
+    const result = await db
+      .insert(mediaPositionsTable)
+      .values(position)
+      .returning();
     return result[0];
   }
 
-  async updateMediaPosition(id: string, updates: Partial<MediaPosition>): Promise<MediaPosition | undefined> {
-    const result = await db.update(mediaPositionsTable)
+  async updateMediaPosition(
+    id: string,
+    updates: Partial<MediaPosition>
+  ): Promise<MediaPosition | undefined> {
+    const result = await db
+      .update(mediaPositionsTable)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(mediaPositionsTable.id, id))
       .returning();
@@ -433,7 +635,9 @@ export class DbStorage implements IStorage {
   }
 
   // Audit logs
-  async createAuditLog(log: Omit<AuditLog, "id" | "createdAt">): Promise<AuditLog> {
+  async createAuditLog(
+    log: Omit<AuditLog, "id" | "createdAt">
+  ): Promise<AuditLog> {
     const result = await db.insert(auditLogsTable).values(log).returning();
     return result[0];
   }
@@ -447,30 +651,43 @@ export class DbStorage implements IStorage {
     limit?: number;
   }): Promise<AuditLog[]> {
     let query = db.select().from(auditLogsTable);
-    
+
     const conditions = [];
-    if (filters?.userId) conditions.push(eq(auditLogsTable.userId, filters.userId));
-    if (filters?.action) conditions.push(eq(auditLogsTable.action, filters.action));
-    if (filters?.resource) conditions.push(eq(auditLogsTable.resource, filters.resource));
-    if (filters?.startDate) conditions.push(drizzleSql`${auditLogsTable.createdAt} >= ${filters.startDate}`);
-    if (filters?.endDate) conditions.push(drizzleSql`${auditLogsTable.createdAt} <= ${filters.endDate}`);
-    
+    if (filters?.userId)
+      conditions.push(eq(auditLogsTable.userId, filters.userId));
+    if (filters?.action)
+      conditions.push(eq(auditLogsTable.action, filters.action));
+    if (filters?.resource)
+      conditions.push(eq(auditLogsTable.resource, filters.resource));
+    if (filters?.startDate)
+      conditions.push(
+        drizzleSql`${auditLogsTable.createdAt} >= ${filters.startDate}`
+      );
+    if (filters?.endDate)
+      conditions.push(
+        drizzleSql`${auditLogsTable.createdAt} <= ${filters.endDate}`
+      );
+
     if (conditions.length > 0) {
       query = query.where(and(...conditions)) as any;
     }
-    
+
     query = query.orderBy(desc(auditLogsTable.createdAt)) as any;
-    
+
     if (filters?.limit) {
       query = query.limit(filters.limit) as any;
     }
-    
+
     return query;
   }
 
   // System settings
   async getSetting(key: string): Promise<SystemSetting | undefined> {
-    const result = await db.select().from(systemSettingsTable).where(eq(systemSettingsTable.key, key)).limit(1);
+    const result = await db
+      .select()
+      .from(systemSettingsTable)
+      .where(eq(systemSettingsTable.key, key))
+      .limit(1);
     return result[0];
   }
 
@@ -479,37 +696,52 @@ export class DbStorage implements IStorage {
   }
 
   async getSettingsByCategory(category: string): Promise<SystemSetting[]> {
-    return db.select().from(systemSettingsTable).where(eq(systemSettingsTable.category, category));
+    return db
+      .select()
+      .from(systemSettingsTable)
+      .where(eq(systemSettingsTable.category, category));
   }
 
   async upsertSetting(setting: InsertSystemSetting): Promise<SystemSetting> {
-    const result = await db.insert(systemSettingsTable)
+    const result = await db
+      .insert(systemSettingsTable)
       .values({ ...setting, updatedAt: new Date() })
       .onConflictDoUpdate({
         target: systemSettingsTable.key,
-        set: { ...setting, updatedAt: new Date() }
+        set: { ...setting, updatedAt: new Date() },
       })
       .returning();
     return result[0];
   }
 
   async deleteSetting(key: string): Promise<boolean> {
-    await db.delete(systemSettingsTable).where(eq(systemSettingsTable.key, key));
+    await db
+      .delete(systemSettingsTable)
+      .where(eq(systemSettingsTable.key, key));
     return true;
   }
 
   // Videos
   async getVideo(id: string): Promise<VideoContent | undefined> {
-    const result = await db.select().from(videoContentTable).where(eq(videoContentTable.id, id)).limit(1);
+    const result = await db
+      .select()
+      .from(videoContentTable)
+      .where(eq(videoContentTable.id, id))
+      .limit(1);
     return result[0];
   }
 
   async getAllVideos(): Promise<VideoContent[]> {
-    return db.select().from(videoContentTable).orderBy(desc(videoContentTable.createdAt));
+    return db
+      .select()
+      .from(videoContentTable)
+      .orderBy(desc(videoContentTable.createdAt));
   }
 
   async getPublishedVideos(): Promise<VideoContent[]> {
-    return db.select().from(videoContentTable)
+    return db
+      .select()
+      .from(videoContentTable)
       .where(eq(videoContentTable.isPublished, true))
       .orderBy(desc(videoContentTable.createdAt));
   }
@@ -519,8 +751,12 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
-  async updateVideo(id: string, updates: Partial<VideoContent>): Promise<VideoContent | undefined> {
-    const result = await db.update(videoContentTable)
+  async updateVideo(
+    id: string,
+    updates: Partial<VideoContent>
+  ): Promise<VideoContent | undefined> {
+    const result = await db
+      .update(videoContentTable)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(videoContentTable.id, id))
       .returning();
@@ -534,19 +770,27 @@ export class DbStorage implements IStorage {
 
   // Additional helper methods
   async getVisibleTeamMembers(): Promise<TeamMember[]> {
-    return db.select().from(teamMembersTable)
+    return db
+      .select()
+      .from(teamMembersTable)
       .where(eq(teamMembersTable.isVisible, true))
       .orderBy(asc(teamMembersTable.displayOrder));
   }
 
-  async getMediaPositionsByCategory(category: string): Promise<MediaPosition[]> {
-    return db.select().from(mediaPositionsTable)
+  async getMediaPositionsByCategory(
+    category: string
+  ): Promise<MediaPosition[]> {
+    return db
+      .select()
+      .from(mediaPositionsTable)
       .where(eq(mediaPositionsTable.category, category))
       .orderBy(asc(mediaPositionsTable.positionKey));
   }
 
   async getActiveMediaPositions(): Promise<MediaPosition[]> {
-    return db.select().from(mediaPositionsTable)
+    return db
+      .select()
+      .from(mediaPositionsTable)
       .where(eq(mediaPositionsTable.isActive, true))
       .orderBy(asc(mediaPositionsTable.positionKey));
   }
@@ -554,83 +798,194 @@ export class DbStorage implements IStorage {
   // Stub implementations for methods not needed by init-admin or current features
   // (These can be implemented later if needed)
   async getContactById(id: string): Promise<Contact | null> {
-    const result = await db.select().from(contactsTable).where(eq(contactsTable.id, id)).limit(1);
+    const result = await db
+      .select()
+      .from(contactsTable)
+      .where(eq(contactsTable.id, id))
+      .limit(1);
     return result[0] || null;
   }
-  
+
   async createTheme(settings: InsertThemeSettings): Promise<ThemeSettings> {
-    const result = await db.insert(themeSettingsTable).values(settings).returning();
+    const result = await db
+      .insert(themeSettingsTable)
+      .values(settings)
+      .returning();
     return result[0];
   }
-  
-  async updateTheme(id: string, updates: Partial<ThemeSettings>): Promise<ThemeSettings | undefined> {
-    const result = await db.update(themeSettingsTable)
+
+  async updateTheme(
+    id: string,
+    updates: Partial<ThemeSettings>
+  ): Promise<ThemeSettings | undefined> {
+    const result = await db
+      .update(themeSettingsTable)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(themeSettingsTable.id, id))
       .returning();
     return result[0];
   }
-  
+
   async deleteTheme(id: string): Promise<boolean> {
     await db.delete(themeSettingsTable).where(eq(themeSettingsTable.id, id));
     return true;
   }
-  
-  async reorderContentSections(pageId: string, sectionOrders: { id: string; displayOrder: number }[]): Promise<boolean> {
+
+  async reorderContentSections(
+    pageId: string,
+    sectionOrders: { id: string; displayOrder: number }[]
+  ): Promise<boolean> {
     throw new Error("Not implemented");
   }
-  
-  async reorderContentBlocks(sectionId: string, blockOrders: { id: string; displayOrder: number }[]): Promise<boolean> {
+
+  async reorderContentBlocks(
+    sectionId: string,
+    blockOrders: { id: string; displayOrder: number }[]
+  ): Promise<boolean> {
     throw new Error("Not implemented");
   }
-  
+
   async searchMediaAssets(query: string): Promise<MediaAsset[]> {
     return [];
   }
-  
+
   async getNavigationTree(): Promise<NavigationItem[]> {
     return this.getAllNavigationItems();
   }
-  
-  async reorderNavigationItems(items: { id: string; displayOrder: number; parentId?: string }[]): Promise<boolean> {
+
+  async reorderNavigationItems(
+    items: { id: string; displayOrder: number; parentId?: string }[]
+  ): Promise<boolean> {
     throw new Error("Not implemented");
   }
-  
-  async getContentNode(id: string): Promise<ContentNode | undefined> { throw new Error("Not implemented"); }
-  async getPageNodes(pageId: string): Promise<ContentNode[]> { return []; }
-  async createContentNode(node: InsertContentNode): Promise<ContentNode> { throw new Error("Not implemented"); }
-  async updateContentNode(id: string, updates: Partial<ContentNode>): Promise<ContentNode | undefined> { throw new Error("Not implemented"); }
-  async deleteContentNode(id: string): Promise<boolean> { throw new Error("Not implemented"); }
-  async reorderContentNodes(pageId: string, nodeOrders: { id: string; displayOrder: number }[]): Promise<boolean> { throw new Error("Not implemented"); }
-  async getContentSection(id: string): Promise<ContentSection | undefined> { throw new Error("Not implemented"); }
-  async getPageSections(pageId: string): Promise<ContentSection[]> { return []; }
-  async createContentSection(section: InsertContentSection): Promise<ContentSection> { throw new Error("Not implemented"); }
-  async updateContentSection(id: string, updates: Partial<ContentSection>): Promise<ContentSection | undefined> { throw new Error("Not implemented"); }
-  async deleteContentSection(id: string): Promise<boolean> { throw new Error("Not implemented"); }
-  async getContentBlock(id: string): Promise<ContentBlock | undefined> { throw new Error("Not implemented"); }
-  async getSectionBlocks(sectionId: string): Promise<ContentBlock[]> { return []; }
-  async createContentBlock(block: InsertContentBlock): Promise<ContentBlock> { throw new Error("Not implemented"); }
-  async updateContentBlock(id: string, updates: Partial<ContentBlock>): Promise<ContentBlock | undefined> { throw new Error("Not implemented"); }
-  async deleteContentBlock(id: string): Promise<boolean> { throw new Error("Not implemented"); }
-  async getMediaAsset(id: string): Promise<MediaAsset | undefined> { throw new Error("Not implemented"); }
-  async getAllMediaAssets(): Promise<MediaAsset[]> { return []; }
-  async createMediaAsset(asset: InsertMediaAsset): Promise<MediaAsset> { throw new Error("Not implemented"); }
-  async updateMediaAsset(id: string, updates: Partial<MediaAsset>): Promise<MediaAsset | undefined> { throw new Error("Not implemented"); }
-  async deleteMediaAsset(id: string): Promise<boolean> { throw new Error("Not implemented"); }
-  async getThemeSettings(id: string): Promise<ThemeSettings | undefined> { throw new Error("Not implemented"); }
-  async getActiveTheme(): Promise<ThemeSettings | undefined> { throw new Error("Not implemented"); }
-  async createThemeSettings(settings: InsertThemeSettings): Promise<ThemeSettings> { throw new Error("Not implemented"); }
-  async updateThemeSettings(id: string, updates: Partial<ThemeSettings>): Promise<ThemeSettings | undefined> { throw new Error("Not implemented"); }
-  async deleteThemeSettings(id: string): Promise<boolean> { throw new Error("Not implemented"); }
-  async activateTheme(id: string): Promise<ThemeSettings | undefined> { throw new Error("Not implemented"); }
-  async getAllThemes(): Promise<ThemeSettings[]> { return []; }
-  async getVideoContent(id: string): Promise<VideoContent | undefined> { throw new Error("Not implemented"); }
-  async getAllVideoContent(): Promise<VideoContent[]> { return []; }
-  async createVideoContent(video: InsertVideoContent): Promise<VideoContent> { throw new Error("Not implemented"); }
-  async updateVideoContent(id: string, updates: Partial<VideoContent>): Promise<VideoContent | undefined> { throw new Error("Not implemented"); }
-  async deleteVideoContent(id: string): Promise<boolean> { throw new Error("Not implemented"); }
+
+  async getContentNode(id: string): Promise<ContentNode | undefined> {
+    throw new Error("Not implemented");
+  }
+  async getPageNodes(pageId: string): Promise<ContentNode[]> {
+    return [];
+  }
+  async createContentNode(node: InsertContentNode): Promise<ContentNode> {
+    throw new Error("Not implemented");
+  }
+  async updateContentNode(
+    id: string,
+    updates: Partial<ContentNode>
+  ): Promise<ContentNode | undefined> {
+    throw new Error("Not implemented");
+  }
+  async deleteContentNode(id: string): Promise<boolean> {
+    throw new Error("Not implemented");
+  }
+  async reorderContentNodes(
+    pageId: string,
+    nodeOrders: { id: string; displayOrder: number }[]
+  ): Promise<boolean> {
+    throw new Error("Not implemented");
+  }
+  async getContentSection(id: string): Promise<ContentSection | undefined> {
+    throw new Error("Not implemented");
+  }
+  async getPageSections(pageId: string): Promise<ContentSection[]> {
+    return [];
+  }
+  async createContentSection(
+    section: InsertContentSection
+  ): Promise<ContentSection> {
+    throw new Error("Not implemented");
+  }
+  async updateContentSection(
+    id: string,
+    updates: Partial<ContentSection>
+  ): Promise<ContentSection | undefined> {
+    throw new Error("Not implemented");
+  }
+  async deleteContentSection(id: string): Promise<boolean> {
+    throw new Error("Not implemented");
+  }
+  async getContentBlock(id: string): Promise<ContentBlock | undefined> {
+    throw new Error("Not implemented");
+  }
+  async getSectionBlocks(sectionId: string): Promise<ContentBlock[]> {
+    return [];
+  }
+  async createContentBlock(block: InsertContentBlock): Promise<ContentBlock> {
+    throw new Error("Not implemented");
+  }
+  async updateContentBlock(
+    id: string,
+    updates: Partial<ContentBlock>
+  ): Promise<ContentBlock | undefined> {
+    throw new Error("Not implemented");
+  }
+  async deleteContentBlock(id: string): Promise<boolean> {
+    throw new Error("Not implemented");
+  }
+  async getMediaAsset(id: string): Promise<MediaAsset | undefined> {
+    throw new Error("Not implemented");
+  }
+  async getAllMediaAssets(): Promise<MediaAsset[]> {
+    return [];
+  }
+  async createMediaAsset(asset: InsertMediaAsset): Promise<MediaAsset> {
+    throw new Error("Not implemented");
+  }
+  async updateMediaAsset(
+    id: string,
+    updates: Partial<MediaAsset>
+  ): Promise<MediaAsset | undefined> {
+    throw new Error("Not implemented");
+  }
+  async deleteMediaAsset(id: string): Promise<boolean> {
+    throw new Error("Not implemented");
+  }
+  async getThemeSettings(id: string): Promise<ThemeSettings | undefined> {
+    throw new Error("Not implemented");
+  }
+  async getActiveTheme(): Promise<ThemeSettings | undefined> {
+    throw new Error("Not implemented");
+  }
+  async createThemeSettings(
+    settings: InsertThemeSettings
+  ): Promise<ThemeSettings> {
+    throw new Error("Not implemented");
+  }
+  async updateThemeSettings(
+    id: string,
+    updates: Partial<ThemeSettings>
+  ): Promise<ThemeSettings | undefined> {
+    throw new Error("Not implemented");
+  }
+  async deleteThemeSettings(id: string): Promise<boolean> {
+    throw new Error("Not implemented");
+  }
+  async activateTheme(id: string): Promise<ThemeSettings | undefined> {
+    throw new Error("Not implemented");
+  }
+  async getAllThemes(): Promise<ThemeSettings[]> {
+    return [];
+  }
+  async getVideoContent(id: string): Promise<VideoContent | undefined> {
+    throw new Error("Not implemented");
+  }
+  async getAllVideoContent(): Promise<VideoContent[]> {
+    return [];
+  }
+  async createVideoContent(video: InsertVideoContent): Promise<VideoContent> {
+    throw new Error("Not implemented");
+  }
+  async updateVideoContent(
+    id: string,
+    updates: Partial<VideoContent>
+  ): Promise<VideoContent | undefined> {
+    throw new Error("Not implemented");
+  }
+  async deleteVideoContent(id: string): Promise<boolean> {
+    throw new Error("Not implemented");
+  }
   async incrementVideoViews(id: string): Promise<void> {
-    await db.update(videoContentTable)
+    await db
+      .update(videoContentTable)
       .set({ views: drizzleSql`${videoContentTable.views} + 1` })
       .where(eq(videoContentTable.id, id));
   }
@@ -673,7 +1028,7 @@ export class MemStorage implements IStorage {
     this.videoContent = new Map();
     this.auditLogs = [];
     this.systemSettings = new Map();
-    
+
     // Initialize default roles
     this.initializeDefaultRoles();
   }
@@ -682,45 +1037,57 @@ export class MemStorage implements IStorage {
     // Super Admin role
     const superAdminRole: Role = {
       id: randomUUID(),
-      name: 'super_admin',
-      description: 'Full system access',
+      name: "super_admin",
+      description: "Full system access",
       permissions: [
-        { resource: 'users', actions: ['create', 'read', 'update', 'delete'] },
-        { resource: 'pages', actions: ['create', 'read', 'update', 'delete', 'publish'] },
-        { resource: 'content', actions: ['create', 'read', 'update', 'delete', 'publish'] },
-        { resource: 'media', actions: ['create', 'read', 'update', 'delete'] },
-        { resource: 'navigation', actions: ['create', 'read', 'update', 'delete'] },
-        { resource: 'themes', actions: ['create', 'read', 'update', 'delete'] },
+        { resource: "users", actions: ["create", "read", "update", "delete"] },
+        {
+          resource: "pages",
+          actions: ["create", "read", "update", "delete", "publish"],
+        },
+        {
+          resource: "content",
+          actions: ["create", "read", "update", "delete", "publish"],
+        },
+        { resource: "media", actions: ["create", "read", "update", "delete"] },
+        {
+          resource: "navigation",
+          actions: ["create", "read", "update", "delete"],
+        },
+        { resource: "themes", actions: ["create", "read", "update", "delete"] },
       ],
       createdAt: new Date(),
     };
-    
+
     // Content Editor role
     const contentEditorRole: Role = {
       id: randomUUID(),
-      name: 'content_editor',
-      description: 'Can edit content and media',
+      name: "content_editor",
+      description: "Can edit content and media",
       permissions: [
-        { resource: 'pages', actions: ['read', 'update'] },
-        { resource: 'content', actions: ['create', 'read', 'update', 'delete'] },
-        { resource: 'media', actions: ['create', 'read', 'update', 'delete'] },
+        { resource: "pages", actions: ["read", "update"] },
+        {
+          resource: "content",
+          actions: ["create", "read", "update", "delete"],
+        },
+        { resource: "media", actions: ["create", "read", "update", "delete"] },
       ],
       createdAt: new Date(),
     };
-    
+
     // Content Viewer role
     const contentViewerRole: Role = {
       id: randomUUID(),
-      name: 'content_viewer',
-      description: 'Read-only access to content',
+      name: "content_viewer",
+      description: "Read-only access to content",
       permissions: [
-        { resource: 'pages', actions: ['read'] },
-        { resource: 'content', actions: ['read'] },
-        { resource: 'media', actions: ['read'] },
+        { resource: "pages", actions: ["read"] },
+        { resource: "content", actions: ["read"] },
+        { resource: "media", actions: ["read"] },
       ],
       createdAt: new Date(),
     };
-    
+
     this.roles.set(superAdminRole.id, superAdminRole);
     this.roles.set(contentEditorRole.id, contentEditorRole);
     this.roles.set(contentViewerRole.id, contentViewerRole);
@@ -732,15 +1099,15 @@ export class MemStorage implements IStorage {
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(
-      (user) => user.username === username,
+      (user) => user.username === username
     );
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
     const now = new Date();
-    const user: User = { 
-      ...insertUser, 
+    const user: User = {
+      ...insertUser,
       id,
       firstName: insertUser.firstName || null,
       lastName: insertUser.lastName || null,
@@ -754,20 +1121,21 @@ export class MemStorage implements IStorage {
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.email === email,
-    );
+    return Array.from(this.users.values()).find((user) => user.email === email);
   }
 
-  async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
+  async updateUser(
+    id: string,
+    updates: Partial<User>
+  ): Promise<User | undefined> {
     const user = this.users.get(id);
     if (!user) return undefined;
-    
-    const updatedUser: User = { 
-      ...user, 
-      ...updates, 
+
+    const updatedUser: User = {
+      ...user,
+      ...updates,
       id, // Preserve ID
-      updatedAt: new Date() 
+      updatedAt: new Date(),
     };
     this.users.set(id, updatedUser);
     return updatedUser;
@@ -776,10 +1144,10 @@ export class MemStorage implements IStorage {
   async deleteUser(id: string): Promise<boolean> {
     // Remove user roles and sessions
     const userRoles = await this.getUserRoles(id);
-    userRoles.forEach(userRole => this.userRoles.delete(userRole.id));
-    
+    userRoles.forEach((userRole) => this.userRoles.delete(userRole.id));
+
     await this.deleteUserSessions(id);
-    
+
     return this.users.delete(id);
   }
 
@@ -793,13 +1161,13 @@ export class MemStorage implements IStorage {
   }
 
   async getRoleByName(name: string): Promise<Role | undefined> {
-    return Array.from(this.roles.values()).find(role => role.name === name);
+    return Array.from(this.roles.values()).find((role) => role.name === name);
   }
 
   async createRole(insertRole: InsertRole): Promise<Role> {
     const id = randomUUID();
-    const role: Role = { 
-      ...insertRole, 
+    const role: Role = {
+      ...insertRole,
       id,
       description: insertRole.description || null,
       permissions: insertRole.permissions || [],
@@ -809,10 +1177,13 @@ export class MemStorage implements IStorage {
     return role;
   }
 
-  async updateRole(id: string, updates: Partial<Role>): Promise<Role | undefined> {
+  async updateRole(
+    id: string,
+    updates: Partial<Role>
+  ): Promise<Role | undefined> {
     const role = this.roles.get(id);
     if (!role) return undefined;
-    
+
     const updatedRole: Role = { ...role, ...updates, id };
     this.roles.set(id, updatedRole);
     return updatedRole;
@@ -820,13 +1191,14 @@ export class MemStorage implements IStorage {
 
   async deleteRole(id: string): Promise<boolean> {
     // Remove all user-role mappings for this role first
-    const roleAssignments = Array.from(this.userRoles.values())
-      .filter(userRole => userRole.roleId === id);
-    
-    roleAssignments.forEach(userRole => {
+    const roleAssignments = Array.from(this.userRoles.values()).filter(
+      (userRole) => userRole.roleId === id
+    );
+
+    roleAssignments.forEach((userRole) => {
       this.userRoles.delete(userRole.id);
     });
-    
+
     return this.roles.delete(id);
   }
 
@@ -835,7 +1207,9 @@ export class MemStorage implements IStorage {
   }
 
   async getUserRoles(userId: string): Promise<UserRole[]> {
-    return Array.from(this.userRoles.values()).filter(ur => ur.userId === userId);
+    return Array.from(this.userRoles.values()).filter(
+      (ur) => ur.userId === userId
+    );
   }
 
   async assignUserRole(userId: string, roleId: string): Promise<UserRole> {
@@ -851,14 +1225,19 @@ export class MemStorage implements IStorage {
   }
 
   async removeUserRole(userId: string, roleId: string): Promise<boolean> {
-    const userRole = Array.from(this.userRoles.values())
-      .find(ur => ur.userId === userId && ur.roleId === roleId);
+    const userRole = Array.from(this.userRoles.values()).find(
+      (ur) => ur.userId === userId && ur.roleId === roleId
+    );
     if (!userRole) return false;
     return this.userRoles.delete(userRole.id);
   }
 
   // Session management
-  async createSession(userId: string, token: string, expiresAt: Date): Promise<AdminSession> {
+  async createSession(
+    userId: string,
+    token: string,
+    expiresAt: Date
+  ): Promise<AdminSession> {
     const id = randomUUID();
     const session: AdminSession = {
       id,
@@ -874,13 +1253,13 @@ export class MemStorage implements IStorage {
   async getSession(token: string): Promise<AdminSession | undefined> {
     const session = this.sessions.get(token);
     if (!session) return undefined;
-    
+
     // Check if session is expired
     if (session.expiresAt < new Date()) {
       this.sessions.delete(token);
       return undefined;
     }
-    
+
     return session;
   }
 
@@ -889,24 +1268,25 @@ export class MemStorage implements IStorage {
   }
 
   async deleteUserSessions(userId: string): Promise<boolean> {
-    const userSessions = Array.from(this.sessions.values())
-      .filter(session => session.userId === userId);
-    
-    userSessions.forEach(session => {
+    const userSessions = Array.from(this.sessions.values()).filter(
+      (session) => session.userId === userId
+    );
+
+    userSessions.forEach((session) => {
       this.sessions.delete(session.token);
     });
-    
+
     return true;
   }
 
   async createContact(insertContact: InsertContact): Promise<Contact> {
     const id = randomUUID();
-    const contact: Contact = { 
-      ...insertContact, 
-      id, 
+    const contact: Contact = {
+      ...insertContact,
+      id,
       phone: insertContact.phone || null,
       organization: insertContact.organization || null,
-      createdAt: new Date() 
+      createdAt: new Date(),
     };
     this.contacts.set(id, contact);
     return contact;
@@ -920,13 +1300,13 @@ export class MemStorage implements IStorage {
 
   // Stub implementations for remaining interface methods
   // TODO: Implement these incrementally as needed
-  
+
   async getPage(id: string): Promise<Page | undefined> {
     return this.pages.get(id);
   }
 
   async getPageBySlug(slug: string): Promise<Page | undefined> {
-    return Array.from(this.pages.values()).find(page => page.slug === slug);
+    return Array.from(this.pages.values()).find((page) => page.slug === slug);
   }
 
   async createPage(insertPage: InsertPage): Promise<Page> {
@@ -935,7 +1315,7 @@ export class MemStorage implements IStorage {
     const page: Page = {
       ...insertPage,
       id,
-      pageType: insertPage.pageType || 'marketing',
+      pageType: insertPage.pageType || "marketing",
       description: insertPage.description || null,
       category: insertPage.category || null,
       metaTitle: insertPage.metaTitle || null,
@@ -954,15 +1334,18 @@ export class MemStorage implements IStorage {
     return page;
   }
 
-  async updatePage(id: string, updates: Partial<Page>): Promise<Page | undefined> {
+  async updatePage(
+    id: string,
+    updates: Partial<Page>
+  ): Promise<Page | undefined> {
     const page = this.pages.get(id);
     if (!page) return undefined;
-    
-    const updatedPage: Page = { 
-      ...page, 
-      ...updates, 
+
+    const updatedPage: Page = {
+      ...page,
+      ...updates,
       id,
-      updatedAt: new Date() 
+      updatedAt: new Date(),
     };
     this.pages.set(id, updatedPage);
     return updatedPage;
@@ -974,7 +1357,7 @@ export class MemStorage implements IStorage {
     for (const section of sections) {
       await this.deleteContentSection(section.id);
     }
-    
+
     return this.pages.delete(id);
   }
 
@@ -983,13 +1366,13 @@ export class MemStorage implements IStorage {
   }
 
   async getPublishedPages(): Promise<Page[]> {
-    return Array.from(this.pages.values()).filter(page => page.isPublished);
+    return Array.from(this.pages.values()).filter((page) => page.isPublished);
   }
 
   async publishPage(id: string, userId: string): Promise<Page | undefined> {
     const page = this.pages.get(id);
     if (!page) return undefined;
-    
+
     const publishedPage: Page = {
       ...page,
       isPublished: true,
@@ -1004,7 +1387,7 @@ export class MemStorage implements IStorage {
   async unpublishPage(id: string): Promise<Page | undefined> {
     const page = this.pages.get(id);
     if (!page) return undefined;
-    
+
     const unpublishedPage: Page = {
       ...page,
       isPublished: false,
@@ -1022,11 +1405,13 @@ export class MemStorage implements IStorage {
 
   async getPageSections(pageId: string): Promise<ContentSection[]> {
     return Array.from(this.contentSections.values())
-      .filter(section => section.pageId === pageId)
+      .filter((section) => section.pageId === pageId)
       .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
   }
 
-  async createContentSection(insertSection: InsertContentSection): Promise<ContentSection> {
+  async createContentSection(
+    insertSection: InsertContentSection
+  ): Promise<ContentSection> {
     const id = randomUUID();
     const now = new Date();
     const section: ContentSection = {
@@ -1044,15 +1429,18 @@ export class MemStorage implements IStorage {
     return section;
   }
 
-  async updateContentSection(id: string, updates: Partial<ContentSection>): Promise<ContentSection | undefined> {
+  async updateContentSection(
+    id: string,
+    updates: Partial<ContentSection>
+  ): Promise<ContentSection | undefined> {
     const section = this.contentSections.get(id);
     if (!section) return undefined;
-    
-    const updatedSection: ContentSection = { 
-      ...section, 
-      ...updates, 
+
+    const updatedSection: ContentSection = {
+      ...section,
+      ...updates,
       id,
-      updatedAt: new Date() 
+      updatedAt: new Date(),
     };
     this.contentSections.set(id, updatedSection);
     return updatedSection;
@@ -1064,11 +1452,14 @@ export class MemStorage implements IStorage {
     for (const block of blocks) {
       this.contentBlocks.delete(block.id);
     }
-    
+
     return this.contentSections.delete(id);
   }
 
-  async reorderContentSections(pageId: string, sectionOrders: { id: string; displayOrder: number }[]): Promise<boolean> {
+  async reorderContentSections(
+    pageId: string,
+    sectionOrders: { id: string; displayOrder: number }[]
+  ): Promise<boolean> {
     sectionOrders.forEach(({ id, displayOrder }) => {
       const section = this.contentSections.get(id);
       if (section && section.pageId === pageId) {
@@ -1090,7 +1481,7 @@ export class MemStorage implements IStorage {
 
   async getPageNodes(pageId: string): Promise<ContentNode[]> {
     return Array.from(this.contentNodes.values())
-      .filter(node => node.pageId === pageId && !node.parentId)
+      .filter((node) => node.pageId === pageId && !node.parentId)
       .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
   }
 
@@ -1112,15 +1503,18 @@ export class MemStorage implements IStorage {
     return node;
   }
 
-  async updateContentNode(id: string, updates: Partial<ContentNode>): Promise<ContentNode | undefined> {
+  async updateContentNode(
+    id: string,
+    updates: Partial<ContentNode>
+  ): Promise<ContentNode | undefined> {
     const node = this.contentNodes.get(id);
     if (!node) return undefined;
-    
-    const updatedNode: ContentNode = { 
-      ...node, 
-      ...updates, 
+
+    const updatedNode: ContentNode = {
+      ...node,
+      ...updates,
       id,
-      updatedAt: new Date() 
+      updatedAt: new Date(),
     };
     this.contentNodes.set(id, updatedNode);
     return updatedNode;
@@ -1128,15 +1522,20 @@ export class MemStorage implements IStorage {
 
   async deleteContentNode(id: string): Promise<boolean> {
     // Delete all child nodes first
-    const childNodes = Array.from(this.contentNodes.values()).filter(n => n.parentId === id);
+    const childNodes = Array.from(this.contentNodes.values()).filter(
+      (n) => n.parentId === id
+    );
     for (const child of childNodes) {
       this.contentNodes.delete(child.id);
     }
-    
+
     return this.contentNodes.delete(id);
   }
 
-  async reorderContentNodes(pageId: string, nodeOrders: { id: string; displayOrder: number }[]): Promise<boolean> {
+  async reorderContentNodes(
+    pageId: string,
+    nodeOrders: { id: string; displayOrder: number }[]
+  ): Promise<boolean> {
     nodeOrders.forEach(({ id, displayOrder }) => {
       const node = this.contentNodes.get(id);
       if (node && node.pageId === pageId) {
@@ -1153,8 +1552,10 @@ export class MemStorage implements IStorage {
 
   async getPagesByType(pageType: string): Promise<Page[]> {
     return Array.from(this.pages.values())
-      .filter(page => page.pageType === pageType)
-      .sort((a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0));
+      .filter((page) => page.pageType === pageType)
+      .sort(
+        (a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0)
+      );
   }
 
   // Content blocks management
@@ -1164,11 +1565,13 @@ export class MemStorage implements IStorage {
 
   async getSectionBlocks(sectionId: string): Promise<ContentBlock[]> {
     return Array.from(this.contentBlocks.values())
-      .filter(block => block.sectionId === sectionId)
+      .filter((block) => block.sectionId === sectionId)
       .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
   }
 
-  async createContentBlock(insertBlock: InsertContentBlock): Promise<ContentBlock> {
+  async createContentBlock(
+    insertBlock: InsertContentBlock
+  ): Promise<ContentBlock> {
     const id = randomUUID();
     const now = new Date();
     const block: ContentBlock = {
@@ -1185,15 +1588,18 @@ export class MemStorage implements IStorage {
     return block;
   }
 
-  async updateContentBlock(id: string, updates: Partial<ContentBlock>): Promise<ContentBlock | undefined> {
+  async updateContentBlock(
+    id: string,
+    updates: Partial<ContentBlock>
+  ): Promise<ContentBlock | undefined> {
     const block = this.contentBlocks.get(id);
     if (!block) return undefined;
-    
-    const updatedBlock: ContentBlock = { 
-      ...block, 
-      ...updates, 
+
+    const updatedBlock: ContentBlock = {
+      ...block,
+      ...updates,
       id,
-      updatedAt: new Date() 
+      updatedAt: new Date(),
     };
     this.contentBlocks.set(id, updatedBlock);
     return updatedBlock;
@@ -1203,7 +1609,10 @@ export class MemStorage implements IStorage {
     return this.contentBlocks.delete(id);
   }
 
-  async reorderContentBlocks(sectionId: string, blockOrders: { id: string; displayOrder: number }[]): Promise<boolean> {
+  async reorderContentBlocks(
+    sectionId: string,
+    blockOrders: { id: string; displayOrder: number }[]
+  ): Promise<boolean> {
     blockOrders.forEach(({ id, displayOrder }) => {
       const block = this.contentBlocks.get(id);
       if (block && block.sectionId === sectionId) {
@@ -1236,10 +1645,13 @@ export class MemStorage implements IStorage {
     return asset;
   }
 
-  async updateMediaAsset(id: string, updates: Partial<MediaAsset>): Promise<MediaAsset | undefined> {
+  async updateMediaAsset(
+    id: string,
+    updates: Partial<MediaAsset>
+  ): Promise<MediaAsset | undefined> {
     const asset = this.mediaAssets.get(id);
     if (!asset) return undefined;
-    
+
     const updatedAsset: MediaAsset = { ...asset, ...updates, id };
     this.mediaAssets.set(id, updatedAsset);
     return updatedAsset;
@@ -1250,33 +1662,39 @@ export class MemStorage implements IStorage {
   }
 
   async getAllMediaAssets(): Promise<MediaAsset[]> {
-    return Array.from(this.mediaAssets.values())
-      .sort((a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0));
+    return Array.from(this.mediaAssets.values()).sort(
+      (a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0)
+    );
   }
 
   async searchMediaAssets(query: string): Promise<MediaAsset[]> {
     const lowerQuery = query.toLowerCase();
     return Array.from(this.mediaAssets.values())
-      .filter(asset => 
-        asset.originalName.toLowerCase().includes(lowerQuery) ||
-        asset.filename.toLowerCase().includes(lowerQuery) ||
-        (asset.altText && asset.altText.toLowerCase().includes(lowerQuery)) ||
-        (asset.caption && asset.caption.toLowerCase().includes(lowerQuery))
+      .filter(
+        (asset) =>
+          asset.originalName.toLowerCase().includes(lowerQuery) ||
+          asset.filename.toLowerCase().includes(lowerQuery) ||
+          (asset.altText && asset.altText.toLowerCase().includes(lowerQuery)) ||
+          (asset.caption && asset.caption.toLowerCase().includes(lowerQuery))
       )
-      .sort((a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0));
+      .sort(
+        (a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0)
+      );
   }
   // Navigation management
   async getNavigationItem(id: string): Promise<NavigationItem | undefined> {
     return this.navigationItems.get(id);
   }
 
-  async createNavigationItem(insertItem: InsertNavigationItem): Promise<NavigationItem> {
+  async createNavigationItem(
+    insertItem: InsertNavigationItem
+  ): Promise<NavigationItem> {
     const id = randomUUID();
     const item: NavigationItem = {
       ...insertItem,
       id,
       href: insertItem.href || null,
-      target: insertItem.target || '_self',
+      target: insertItem.target || "_self",
       displayOrder: insertItem.displayOrder || 0,
       parentId: insertItem.parentId || null,
       isVisible: true,
@@ -1286,10 +1704,13 @@ export class MemStorage implements IStorage {
     return item;
   }
 
-  async updateNavigationItem(id: string, updates: Partial<NavigationItem>): Promise<NavigationItem | undefined> {
+  async updateNavigationItem(
+    id: string,
+    updates: Partial<NavigationItem>
+  ): Promise<NavigationItem | undefined> {
     const item = this.navigationItems.get(id);
     if (!item) return undefined;
-    
+
     const updatedItem: NavigationItem = { ...item, ...updates, id };
     this.navigationItems.set(id, updatedItem);
     return updatedItem;
@@ -1297,31 +1718,37 @@ export class MemStorage implements IStorage {
 
   async deleteNavigationItem(id: string): Promise<boolean> {
     // Delete children first
-    const children = Array.from(this.navigationItems.values())
-      .filter(item => item.parentId === id);
-    
-    children.forEach(child => {
+    const children = Array.from(this.navigationItems.values()).filter(
+      (item) => item.parentId === id
+    );
+
+    children.forEach((child) => {
       this.navigationItems.delete(child.id);
     });
-    
+
     return this.navigationItems.delete(id);
   }
 
   async getAllNavigationItems(): Promise<NavigationItem[]> {
-    return Array.from(this.navigationItems.values())
-      .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+    return Array.from(this.navigationItems.values()).sort(
+      (a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)
+    );
   }
 
   async getNavigationTree(): Promise<NavigationItem[]> {
     const allItems = await this.getAllNavigationItems();
-    const parentItems = allItems.filter(item => !item.parentId && item.isVisible);
-    
+    const parentItems = allItems.filter(
+      (item) => !item.parentId && item.isVisible
+    );
+
     // Note: In a real implementation, you'd build a proper tree structure
     // For simplicity, returning flat list of parent items
     return parentItems;
   }
 
-  async reorderNavigationItems(itemOrders: { id: string; displayOrder: number }[]): Promise<boolean> {
+  async reorderNavigationItems(
+    itemOrders: { id: string; displayOrder: number }[]
+  ): Promise<boolean> {
     itemOrders.forEach(({ id, displayOrder }) => {
       const item = this.navigationItems.get(id);
       if (item) {
@@ -1340,11 +1767,14 @@ export class MemStorage implements IStorage {
   }
 
   async getActiveTheme(): Promise<ThemeSettings | undefined> {
-    return Array.from(this.themeSettings.values())
-      .find(theme => theme.isActive);
+    return Array.from(this.themeSettings.values()).find(
+      (theme) => theme.isActive
+    );
   }
 
-  async createThemeSettings(insertTheme: InsertThemeSettings): Promise<ThemeSettings> {
+  async createThemeSettings(
+    insertTheme: InsertThemeSettings
+  ): Promise<ThemeSettings> {
     const id = randomUUID();
     const now = new Date();
     const theme: ThemeSettings = {
@@ -1360,15 +1790,18 @@ export class MemStorage implements IStorage {
     return theme;
   }
 
-  async updateThemeSettings(id: string, updates: Partial<ThemeSettings>): Promise<ThemeSettings | undefined> {
+  async updateThemeSettings(
+    id: string,
+    updates: Partial<ThemeSettings>
+  ): Promise<ThemeSettings | undefined> {
     const theme = this.themeSettings.get(id);
     if (!theme) return undefined;
-    
-    const updatedTheme: ThemeSettings = { 
-      ...theme, 
-      ...updates, 
+
+    const updatedTheme: ThemeSettings = {
+      ...theme,
+      ...updates,
       id,
-      updatedAt: new Date() 
+      updatedAt: new Date(),
     };
     this.themeSettings.set(id, updatedTheme);
     return updatedTheme;
@@ -1379,14 +1812,15 @@ export class MemStorage implements IStorage {
   }
 
   async getAllThemes(): Promise<ThemeSettings[]> {
-    return Array.from(this.themeSettings.values())
-      .sort((a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0));
+    return Array.from(this.themeSettings.values()).sort(
+      (a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0)
+    );
   }
 
   async activateTheme(id: string): Promise<ThemeSettings | undefined> {
     const theme = this.themeSettings.get(id);
     if (!theme) return undefined;
-    
+
     // Deactivate all other themes
     this.themeSettings.forEach((existingTheme, existingId) => {
       if (existingTheme.isActive) {
@@ -1398,7 +1832,7 @@ export class MemStorage implements IStorage {
         this.themeSettings.set(existingId, deactivatedTheme);
       }
     });
-    
+
     // Activate the target theme
     const activatedTheme: ThemeSettings = {
       ...theme,
@@ -1437,10 +1871,13 @@ export class MemStorage implements IStorage {
     return member;
   }
 
-  async updateTeamMember(id: string, updates: Partial<TeamMember>): Promise<TeamMember | undefined> {
+  async updateTeamMember(
+    id: string,
+    updates: Partial<TeamMember>
+  ): Promise<TeamMember | undefined> {
     const member = this.teamMembers.get(id);
     if (!member) return undefined;
-    
+
     const updatedMember: TeamMember = {
       ...member,
       ...updates,
@@ -1456,13 +1893,14 @@ export class MemStorage implements IStorage {
   }
 
   async getAllTeamMembers(): Promise<TeamMember[]> {
-    return Array.from(this.teamMembers.values())
-      .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+    return Array.from(this.teamMembers.values()).sort(
+      (a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)
+    );
   }
 
   async getVisibleTeamMembers(): Promise<TeamMember[]> {
     return Array.from(this.teamMembers.values())
-      .filter(member => member.isVisible)
+      .filter((member) => member.isVisible)
       .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
   }
 
@@ -1472,10 +1910,14 @@ export class MemStorage implements IStorage {
   }
 
   async getMediaPositionByKey(key: string): Promise<MediaPosition | undefined> {
-    return Array.from(this.mediaPositions.values()).find(position => position.positionKey === key);
+    return Array.from(this.mediaPositions.values()).find(
+      (position) => position.positionKey === key
+    );
   }
 
-  async createMediaPosition(position: InsertMediaPosition): Promise<MediaPosition> {
+  async createMediaPosition(
+    position: InsertMediaPosition
+  ): Promise<MediaPosition> {
     const id = randomUUID();
     const now = new Date();
     const newPosition: MediaPosition = {
@@ -1497,10 +1939,13 @@ export class MemStorage implements IStorage {
     return newPosition;
   }
 
-  async updateMediaPosition(id: string, updates: Partial<MediaPosition>): Promise<MediaPosition | undefined> {
+  async updateMediaPosition(
+    id: string,
+    updates: Partial<MediaPosition>
+  ): Promise<MediaPosition | undefined> {
     const position = this.mediaPositions.get(id);
     if (!position) return undefined;
-    
+
     const updatedPosition: MediaPosition = {
       ...position,
       ...updates,
@@ -1516,19 +1961,22 @@ export class MemStorage implements IStorage {
   }
 
   async getAllMediaPositions(): Promise<MediaPosition[]> {
-    return Array.from(this.mediaPositions.values())
-      .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+    return Array.from(this.mediaPositions.values()).sort(
+      (a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)
+    );
   }
 
-  async getMediaPositionsByCategory(category: string): Promise<MediaPosition[]> {
+  async getMediaPositionsByCategory(
+    category: string
+  ): Promise<MediaPosition[]> {
     return Array.from(this.mediaPositions.values())
-      .filter(position => position.category === category)
+      .filter((position) => position.category === category)
       .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
   }
 
   async getActiveMediaPositions(): Promise<MediaPosition[]> {
     return Array.from(this.mediaPositions.values())
-      .filter(position => position.isActive)
+      .filter((position) => position.isActive)
       .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
   }
 
@@ -1545,7 +1993,7 @@ export class MemStorage implements IStorage {
       description: video.description ?? null,
       thumbnailUrl: video.thumbnailUrl ?? null,
       duration: video.duration ?? null,
-      category: video.category ?? 'Webinar',
+      category: video.category ?? "Webinar",
       isPublished: video.isPublished ?? false,
       views: video.views ?? 0,
       displayOrder: video.displayOrder ?? 0,
@@ -1558,10 +2006,13 @@ export class MemStorage implements IStorage {
     return newVideo;
   }
 
-  async updateVideo(id: string, updates: Partial<VideoContent>): Promise<VideoContent | undefined> {
+  async updateVideo(
+    id: string,
+    updates: Partial<VideoContent>
+  ): Promise<VideoContent | undefined> {
     const video = this.videoContent.get(id);
     if (!video) return undefined;
-    
+
     const updatedVideo: VideoContent = {
       ...video,
       ...updates,
@@ -1577,17 +2028,20 @@ export class MemStorage implements IStorage {
   }
 
   async getAllVideos(): Promise<VideoContent[]> {
-    return Array.from(this.videoContent.values())
-      .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+    return Array.from(this.videoContent.values()).sort(
+      (a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)
+    );
   }
 
   async getPublishedVideos(): Promise<VideoContent[]> {
     return Array.from(this.videoContent.values())
-      .filter(video => video.isPublished)
+      .filter((video) => video.isPublished)
       .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
   }
 
-  async createAuditLog(log: Omit<AuditLog, 'id' | 'createdAt'>): Promise<AuditLog> {
+  async createAuditLog(
+    log: Omit<AuditLog, "id" | "createdAt">
+  ): Promise<AuditLog> {
     const auditLog: AuditLog = {
       ...log,
       id: randomUUID(),
@@ -1596,25 +2050,30 @@ export class MemStorage implements IStorage {
     this.auditLogs.push(auditLog);
     return auditLog;
   }
-  async getAuditLogs(filters?: { userId?: string; resource?: string; action?: string; limit?: number }): Promise<AuditLog[]> {
+  async getAuditLogs(filters?: {
+    userId?: string;
+    resource?: string;
+    action?: string;
+    limit?: number;
+  }): Promise<AuditLog[]> {
     let logs = [...this.auditLogs];
-    
+
     if (filters?.userId) {
-      logs = logs.filter(log => log.userId === filters.userId);
+      logs = logs.filter((log) => log.userId === filters.userId);
     }
     if (filters?.resource) {
-      logs = logs.filter(log => log.resource === filters.resource);
+      logs = logs.filter((log) => log.resource === filters.resource);
     }
     if (filters?.action) {
-      logs = logs.filter(log => log.action === filters.action);
+      logs = logs.filter((log) => log.action === filters.action);
     }
-    
+
     logs.sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
-    
+
     if (filters?.limit) {
       logs = logs.slice(0, filters.limit);
     }
-    
+
     return logs;
   }
 
@@ -1627,25 +2086,26 @@ export class MemStorage implements IStorage {
   }
 
   async getSettingsByCategory(category: string): Promise<SystemSetting[]> {
-    return Array.from(this.systemSettings.values())
-      .filter(setting => setting.category === category);
+    return Array.from(this.systemSettings.values()).filter(
+      (setting) => setting.category === category
+    );
   }
 
   async upsertSetting(setting: InsertSystemSetting): Promise<SystemSetting> {
     const existing = this.systemSettings.get(setting.key);
     const id = existing?.id ?? randomUUID();
     const now = new Date();
-    
+
     const newSetting: SystemSetting = {
       ...setting,
       id,
       value: setting.value ?? null,
-      category: setting.category ?? 'general',
+      category: setting.category ?? "general",
       description: setting.description ?? null,
       updatedAt: now,
       updatedBy: setting.updatedBy ?? null,
     };
-    
+
     this.systemSettings.set(setting.key, newSetting);
     return newSetting;
   }

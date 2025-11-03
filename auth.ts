@@ -1,8 +1,8 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
-import { storage } from "./storage";  
-import { type User, type Role, type Permission } from "@myhealthintegral/shared";
+import { storage } from "./storage";
+import { type User, type Role, type Permission } from "@myhi2025/shared";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -17,31 +17,33 @@ export const hashPassword = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, saltRounds);
 };
 
-export const verifyPassword = async (password: string, hashedPassword: string): Promise<boolean> => {
+export const verifyPassword = async (
+  password: string,
+  hashedPassword: string
+): Promise<boolean> => {
   return await bcrypt.compare(password, hashedPassword);
 };
 
 // JWT token generation
 export const generateAccessToken = (userId: string): string => {
-  return jwt.sign(
-    { userId, type: "access" },
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN }
-  );
+  return jwt.sign({ userId, type: "access" }, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN,
+  });
 };
 
 export const generateRefreshToken = (userId: string): string => {
-  return jwt.sign(
-    { userId, type: "refresh" },
-    JWT_SECRET,
-    { expiresIn: "7d" }
-  );
+  return jwt.sign({ userId, type: "refresh" }, JWT_SECRET, { expiresIn: "7d" });
 };
 
 // JWT token verification
-export const verifyToken = (token: string): { userId: string; type: string } | null => {
+export const verifyToken = (
+  token: string
+): { userId: string; type: string } | null => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; type: string };
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      userId: string;
+      type: string;
+    };
     return decoded;
   } catch (error) {
     return null;
@@ -49,7 +51,11 @@ export const verifyToken = (token: string): { userId: string; type: string } | n
 };
 
 // Authentication middleware
-export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
+export const authenticateToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
 
@@ -78,7 +84,9 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
 };
 
 // Permission checking
-export const getUserPermissions = async (userId: string): Promise<Permission[]> => {
+export const getUserPermissions = async (
+  userId: string
+): Promise<Permission[]> => {
   const userRoles = await storage.getUserRoles(userId);
   const allPermissions: Permission[] = [];
 
@@ -90,18 +98,25 @@ export const getUserPermissions = async (userId: string): Promise<Permission[]> 
   }
 
   // Remove duplicates
-  const uniquePermissions = allPermissions.filter((permission, index, self) => 
-    index === self.findIndex(p => p.resource === permission.resource)
+  const uniquePermissions = allPermissions.filter(
+    (permission, index, self) =>
+      index === self.findIndex((p) => p.resource === permission.resource)
   );
 
   return uniquePermissions;
 };
 
-export const hasPermission = async (userId: string, resource: string, action: string): Promise<boolean> => {
+export const hasPermission = async (
+  userId: string,
+  resource: string,
+  action: string
+): Promise<boolean> => {
   const permissions = await getUserPermissions(userId);
-  
-  return permissions.some(permission => 
-    permission.resource === resource && permission.actions.includes(action as any)
+
+  return permissions.some(
+    (permission) =>
+      permission.resource === resource &&
+      permission.actions.includes(action as any)
   );
 };
 
@@ -109,7 +124,7 @@ export const hasPermission = async (userId: string, resource: string, action: st
 export const requirePermission = (resource: string, action: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const user = (req as any).user;
-    
+
     if (!user) {
       return res.status(401).json({ error: "Authentication required" });
     }
@@ -122,18 +137,18 @@ export const requirePermission = (resource: string, action: string) => {
         action: "unauthorized_access",
         resource: resource,
         resourceId: null,
-        details: { 
+        details: {
           attempted_action: action,
           ip_address: req.ip,
-          user_agent: req.get("User-Agent") 
+          user_agent: req.get("User-Agent"),
         },
         ipAddress: req.ip || null,
         userAgent: req.get("User-Agent") || null,
         createdAt: new Date(),
       });
 
-      return res.status(403).json({ 
-        error: `Insufficient permissions. Required: ${action} on ${resource}` 
+      return res.status(403).json({
+        error: `Insufficient permissions. Required: ${action} on ${resource}`,
       });
     }
 
@@ -145,15 +160,17 @@ export const requirePermission = (resource: string, action: string) => {
 export const createUserSession = async (userId: string): Promise<string> => {
   // Clean up any existing sessions for this user first (optional, for single session per user)
   // await storage.deleteUserSessions(userId);
-  
+
   const refreshToken = generateRefreshToken(userId);
   const expiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRES_IN);
-  
+
   await storage.createSession(userId, refreshToken, expiresAt);
   return refreshToken;
 };
 
-export const refreshAccessToken = async (refreshToken: string): Promise<string | null> => {
+export const refreshAccessToken = async (
+  refreshToken: string
+): Promise<string | null> => {
   // First verify the JWT token itself
   const decoded = verifyToken(refreshToken);
   if (!decoded || decoded.type !== "refresh") {
@@ -200,12 +217,14 @@ export const logoutUser = async (refreshToken: string): Promise<boolean> => {
       createdAt: new Date(),
     });
   }
-  
+
   const result = await storage.deleteSession(refreshToken);
   return result.success;
 };
 
-export const logoutAllUserSessions = async (userId: string): Promise<boolean> => {
+export const logoutAllUserSessions = async (
+  userId: string
+): Promise<boolean> => {
   // Log the logout all action
   await storage.createAuditLog({
     userId,
@@ -217,7 +236,7 @@ export const logoutAllUserSessions = async (userId: string): Promise<boolean> =>
     userAgent: null,
     createdAt: new Date(),
   });
-  
+
   // Note: deleteUserSessions not yet implemented in storage
   // return await storage.deleteUserSessions(userId);
   return true;
@@ -245,46 +264,50 @@ export const logUserAction = async (
 };
 
 // Security helpers
-export const validatePasswordStrength = (password: string): { isValid: boolean; errors: string[] } => {
+export const validatePasswordStrength = (
+  password: string
+): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
-  
+
   if (password.length < 8) {
     errors.push("Password must be at least 8 characters long");
   }
-  
+
   if (!/[A-Z]/.test(password)) {
     errors.push("Password must contain at least one uppercase letter");
   }
-  
+
   if (!/[a-z]/.test(password)) {
     errors.push("Password must contain at least one lowercase letter");
   }
-  
+
   if (!/\d/.test(password)) {
     errors.push("Password must contain at least one number");
   }
-  
+
   if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
     errors.push("Password must contain at least one special character");
   }
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
   };
 };
 
 // Password change tracking for security
-export const requirePasswordChange = async (userId: string): Promise<boolean> => {
+export const requirePasswordChange = async (
+  userId: string
+): Promise<boolean> => {
   const user = await storage.getUser(userId);
   if (!user) return false;
-  
+
   // Mark user as requiring password change
-  await storage.updateUser(userId, { 
+  await storage.updateUser(userId, {
     // Note: We'd need to add a requirePasswordChange field to the schema for this
     // For now, we'll use audit logs to track this
   });
-  
+
   await storage.createAuditLog({
     userId,
     action: "require_password_change",
@@ -295,37 +318,41 @@ export const requirePasswordChange = async (userId: string): Promise<boolean> =>
     userAgent: "System",
     createdAt: new Date(),
   });
-  
+
   return true;
 };
 
 const loginAttempts = new Map<string, { count: number; lastAttempt: Date }>();
 
-export const checkRateLimit = (identifier: string, maxAttempts: number = 5, windowMs: number = 15 * 60 * 1000): boolean => {
+export const checkRateLimit = (
+  identifier: string,
+  maxAttempts: number = 5,
+  windowMs: number = 15 * 60 * 1000
+): boolean => {
   const now = new Date();
   const attempt = loginAttempts.get(identifier);
-  
+
   if (!attempt) {
     loginAttempts.set(identifier, { count: 1, lastAttempt: now });
     return true;
   }
-  
+
   const timeDiff = now.getTime() - attempt.lastAttempt.getTime();
-  
+
   if (timeDiff > windowMs) {
     // Reset window
     loginAttempts.set(identifier, { count: 1, lastAttempt: now });
     return true;
   }
-  
+
   if (attempt.count >= maxAttempts) {
     return false;
   }
-  
+
   attempt.count++;
   attempt.lastAttempt = now;
   loginAttempts.set(identifier, attempt);
-  
+
   return true;
 };
 
@@ -337,6 +364,7 @@ export const isTokenBlacklisted = async (token: string): Promise<boolean> => {
   return false;
 };
 
-export const blacklistToken = async (token: string, reason: string): Promise<void> => {
-  
-};
+export const blacklistToken = async (
+  token: string,
+  reason: string
+): Promise<void> => {};

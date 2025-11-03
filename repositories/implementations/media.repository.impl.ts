@@ -1,10 +1,12 @@
-import { IMediaRepository } from '../media.repository';
-import { NotFoundError, DuplicateError } from '../base.repository';
-import type { 
-  MediaPosition, InsertMediaPosition,
-  VideoContent, InsertVideoContent
-} from '@myhealthintegral/shared';
-import { randomUUID } from 'crypto';
+import { IMediaRepository } from "../media.repository";
+import { NotFoundError, DuplicateError } from "../base.repository";
+import type {
+  MediaPosition,
+  InsertMediaPosition,
+  VideoContent,
+  InsertVideoContent,
+} from "@myhi2025/shared";
+import { randomUUID } from "crypto";
 
 export class MediaRepositoryImpl implements IMediaRepository {
   private mediaPositions: Map<string, MediaPosition>;
@@ -19,25 +21,32 @@ export class MediaRepositoryImpl implements IMediaRepository {
     return this.mediaPositions.get(id) || null;
   }
 
-  async findMediaPositionByKey(positionKey: string): Promise<MediaPosition | null> {
-    return Array.from(this.mediaPositions.values()).find(position => position.positionKey === positionKey) || null;
+  async findMediaPositionByKey(
+    positionKey: string
+  ): Promise<MediaPosition | null> {
+    return (
+      Array.from(this.mediaPositions.values()).find(
+        (position) => position.positionKey === positionKey
+      ) || null
+    );
   }
 
   async getAllMediaPositions(): Promise<MediaPosition[]> {
-    return Array.from(this.mediaPositions.values())
-      .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+    return Array.from(this.mediaPositions.values()).sort(
+      (a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)
+    );
   }
 
   async getPublicMediaPositions(): Promise<MediaPosition[]> {
     return Array.from(this.mediaPositions.values())
-      .filter(position => position.isActive)
+      .filter((position) => position.isActive)
       .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
   }
 
   async createMediaPosition(data: InsertMediaPosition): Promise<MediaPosition> {
     const existing = await this.findMediaPositionByKey(data.positionKey);
     if (existing) {
-      throw new DuplicateError('MediaPosition', 'positionKey');
+      throw new DuplicateError("MediaPosition", "positionKey");
     }
 
     const id = randomUUID();
@@ -61,12 +70,15 @@ export class MediaRepositoryImpl implements IMediaRepository {
     return newPosition;
   }
 
-  async updateMediaPosition(id: string, data: Partial<MediaPosition>): Promise<MediaPosition> {
+  async updateMediaPosition(
+    id: string,
+    data: Partial<MediaPosition>
+  ): Promise<MediaPosition> {
     const position = this.mediaPositions.get(id);
     if (!position) {
-      throw new NotFoundError('MediaPosition', id);
+      throw new NotFoundError("MediaPosition", id);
     }
-    
+
     const updatedPosition: MediaPosition = {
       ...position,
       ...data,
@@ -77,14 +89,16 @@ export class MediaRepositoryImpl implements IMediaRepository {
     return updatedPosition;
   }
 
-  async deleteMediaPosition(id: string): Promise<{ success: boolean; message: string }> {
+  async deleteMediaPosition(
+    id: string
+  ): Promise<{ success: boolean; message: string }> {
     const position = this.mediaPositions.get(id);
     if (!position) {
-      throw new NotFoundError('MediaPosition', id);
+      throw new NotFoundError("MediaPosition", id);
     }
 
     this.mediaPositions.delete(id);
-    return { success: true, message: 'Media position deleted successfully' };
+    return { success: true, message: "Media position deleted successfully" };
   }
 
   async findVideoById(id: string): Promise<VideoContent | null> {
@@ -92,13 +106,14 @@ export class MediaRepositoryImpl implements IMediaRepository {
   }
 
   async getAllVideos(): Promise<VideoContent[]> {
-    return Array.from(this.videoContent.values())
-      .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+    return Array.from(this.videoContent.values()).sort(
+      (a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)
+    );
   }
 
   async getPublishedVideos(): Promise<VideoContent[]> {
     return Array.from(this.videoContent.values())
-      .filter(video => video.isPublished)
+      .filter((video) => video.isPublished)
       .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
   }
 
@@ -111,7 +126,7 @@ export class MediaRepositoryImpl implements IMediaRepository {
       description: data.description ?? null,
       thumbnailUrl: data.thumbnailUrl ?? null,
       duration: data.duration ?? null,
-      category: data.category ?? 'Webinar',
+      category: data.category ?? "Webinar",
       isPublished: data.isPublished ?? false,
       views: data.views ?? 0,
       displayOrder: data.displayOrder ?? 0,
@@ -124,12 +139,15 @@ export class MediaRepositoryImpl implements IMediaRepository {
     return newVideo;
   }
 
-  async updateVideo(id: string, data: Partial<VideoContent>): Promise<VideoContent> {
+  async updateVideo(
+    id: string,
+    data: Partial<VideoContent>
+  ): Promise<VideoContent> {
     const video = this.videoContent.get(id);
     if (!video) {
-      throw new NotFoundError('VideoContent', id);
+      throw new NotFoundError("VideoContent", id);
     }
-    
+
     const updatedVideo: VideoContent = {
       ...video,
       ...data,
@@ -140,20 +158,22 @@ export class MediaRepositoryImpl implements IMediaRepository {
     return updatedVideo;
   }
 
-  async deleteVideo(id: string): Promise<{ success: boolean; message: string }> {
+  async deleteVideo(
+    id: string
+  ): Promise<{ success: boolean; message: string }> {
     const video = this.videoContent.get(id);
     if (!video) {
-      throw new NotFoundError('VideoContent', id);
+      throw new NotFoundError("VideoContent", id);
     }
 
     this.videoContent.delete(id);
-    return { success: true, message: 'Video deleted successfully' };
+    return { success: true, message: "Video deleted successfully" };
   }
 
   async incrementVideoViews(id: string): Promise<VideoContent> {
     const video = this.videoContent.get(id);
     if (!video) {
-      throw new NotFoundError('VideoContent', id);
+      throw new NotFoundError("VideoContent", id);
     }
 
     const updatedVideo: VideoContent = {

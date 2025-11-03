@@ -1,4 +1,4 @@
-import type { TeamMember, InsertTeamMember } from "@myhealthintegral/shared";
+import type { TeamMember, InsertTeamMember } from "@myhi2025/shared";
 
 /**
  * Team Repository Interface

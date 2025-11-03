@@ -1,13 +1,16 @@
-import { ISystemRepository } from '../system.repository';
-import { NotFoundError, RepositoryError } from '../base.repository';
-import type { 
-  ThemeSettings, InsertThemeSettings,
+import { ISystemRepository } from "../system.repository";
+import { NotFoundError, RepositoryError } from "../base.repository";
+import type {
+  ThemeSettings,
+  InsertThemeSettings,
   AdminSession,
   AuditLog,
-  DashboardWidget, InsertDashboardWidget,
-  SystemSetting, InsertSystemSetting
-} from '@myhealthintegral/shared';
-import { randomUUID } from 'crypto';
+  DashboardWidget,
+  InsertDashboardWidget,
+  SystemSetting,
+  InsertSystemSetting,
+} from "@myhi2025/shared";
+import { randomUUID } from "crypto";
 
 export class SystemRepositoryImpl implements ISystemRepository {
   private themeSettings: Map<string, ThemeSettings>;
@@ -25,13 +28,16 @@ export class SystemRepositoryImpl implements ISystemRepository {
   }
 
   async getActiveTheme(): Promise<ThemeSettings | null> {
-    return Array.from(this.themeSettings.values())
-      .find(theme => theme.isActive) || null;
+    return (
+      Array.from(this.themeSettings.values()).find((theme) => theme.isActive) ||
+      null
+    );
   }
 
   async getAllThemes(): Promise<ThemeSettings[]> {
-    return Array.from(this.themeSettings.values())
-      .sort((a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0));
+    return Array.from(this.themeSettings.values()).sort(
+      (a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0)
+    );
   }
 
   async createTheme(data: InsertThemeSettings): Promise<ThemeSettings> {
@@ -50,17 +56,20 @@ export class SystemRepositoryImpl implements ISystemRepository {
     return theme;
   }
 
-  async updateTheme(id: string, data: Partial<ThemeSettings>): Promise<ThemeSettings> {
+  async updateTheme(
+    id: string,
+    data: Partial<ThemeSettings>
+  ): Promise<ThemeSettings> {
     const theme = this.themeSettings.get(id);
     if (!theme) {
-      throw new NotFoundError('ThemeSettings', id);
+      throw new NotFoundError("ThemeSettings", id);
     }
-    
-    const updatedTheme: ThemeSettings = { 
-      ...theme, 
-      ...data, 
+
+    const updatedTheme: ThemeSettings = {
+      ...theme,
+      ...data,
       id,
-      updatedAt: new Date() 
+      updatedAt: new Date(),
     };
     this.themeSettings.set(id, updatedTheme);
     return updatedTheme;
@@ -69,9 +78,9 @@ export class SystemRepositoryImpl implements ISystemRepository {
   async activateTheme(id: string): Promise<ThemeSettings> {
     const theme = this.themeSettings.get(id);
     if (!theme) {
-      throw new NotFoundError('ThemeSettings', id);
+      throw new NotFoundError("ThemeSettings", id);
     }
-    
+
     this.themeSettings.forEach((existingTheme, existingId) => {
       if (existingTheme.isActive) {
         const deactivatedTheme: ThemeSettings = {
@@ -82,7 +91,7 @@ export class SystemRepositoryImpl implements ISystemRepository {
         this.themeSettings.set(existingId, deactivatedTheme);
       }
     });
-    
+
     const activatedTheme: ThemeSettings = {
       ...theme,
       isActive: true,
@@ -92,37 +101,43 @@ export class SystemRepositoryImpl implements ISystemRepository {
     return activatedTheme;
   }
 
-  async deleteTheme(id: string): Promise<{ success: boolean; message: string }> {
+  async deleteTheme(
+    id: string
+  ): Promise<{ success: boolean; message: string }> {
     const theme = this.themeSettings.get(id);
     if (!theme) {
-      throw new NotFoundError('ThemeSettings', id);
+      throw new NotFoundError("ThemeSettings", id);
     }
-    
+
     if (theme.isActive) {
-      throw new RepositoryError('Cannot delete active theme', 'CONFLICT', 409);
+      throw new RepositoryError("Cannot delete active theme", "CONFLICT", 409);
     }
-    
+
     this.themeSettings.delete(id);
-    return { success: true, message: 'Theme deleted successfully' };
+    return { success: true, message: "Theme deleted successfully" };
   }
 
   async findSessionById(id: string): Promise<AdminSession | null> {
-    return Array.from(this.sessions.values()).find(s => s.id === id) || null;
+    return Array.from(this.sessions.values()).find((s) => s.id === id) || null;
   }
 
   async findSessionByToken(token: string): Promise<AdminSession | null> {
     const session = this.sessions.get(token);
     if (!session) return null;
-    
+
     if (session.expiresAt < new Date()) {
       this.sessions.delete(token);
       return null;
     }
-    
+
     return session;
   }
 
-  async createSession(userId: string, token: string, expiresAt: Date): Promise<AdminSession> {
+  async createSession(
+    userId: string,
+    token: string,
+    expiresAt: Date
+  ): Promise<AdminSession> {
     const id = randomUUID();
     const session: AdminSession = {
       id,
@@ -136,9 +151,9 @@ export class SystemRepositoryImpl implements ISystemRepository {
   }
 
   async deleteSession(id: string): Promise<{ success: boolean }> {
-    const session = Array.from(this.sessions.values()).find(s => s.id === id);
+    const session = Array.from(this.sessions.values()).find((s) => s.id === id);
     if (!session) {
-      throw new NotFoundError('AdminSession', id);
+      throw new NotFoundError("AdminSession", id);
     }
 
     this.sessions.delete(session.token);
@@ -166,27 +181,29 @@ export class SystemRepositoryImpl implements ISystemRepository {
     limit?: number;
   }): Promise<AuditLog[]> {
     let logs = [...this.auditLogs];
-    
+
     if (filters?.userId) {
-      logs = logs.filter(log => log.userId === filters.userId);
+      logs = logs.filter((log) => log.userId === filters.userId);
     }
     if (filters?.resource) {
-      logs = logs.filter(log => log.resource === filters.resource);
+      logs = logs.filter((log) => log.resource === filters.resource);
     }
     if (filters?.action) {
-      logs = logs.filter(log => log.action === filters.action);
+      logs = logs.filter((log) => log.action === filters.action);
     }
-    
+
     logs.sort((a, b) => b.createdAt!.getTime() - a.createdAt!.getTime());
-    
+
     if (filters?.limit) {
       logs = logs.slice(0, filters.limit);
     }
-    
+
     return logs;
   }
 
-  async createAuditLog(data: Omit<AuditLog, "id" | "timestamp">): Promise<AuditLog> {
+  async createAuditLog(
+    data: Omit<AuditLog, "id" | "timestamp">
+  ): Promise<AuditLog> {
     const auditLog: AuditLog = {
       ...data,
       id: randomUUID(),
@@ -199,14 +216,14 @@ export class SystemRepositoryImpl implements ISystemRepository {
   // Dashboard Widget Methods
   async getUserWidgets(userId: string): Promise<DashboardWidget[]> {
     const widgets = Array.from(this.dashboardWidgets.values())
-      .filter(w => w.userId === userId)
+      .filter((w) => w.userId === userId)
       .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
-    
+
     // If no widgets exist for user, create default layout
     if (widgets.length === 0) {
       return this.resetUserWidgets(userId);
     }
-    
+
     return widgets;
   }
 
@@ -227,12 +244,15 @@ export class SystemRepositoryImpl implements ISystemRepository {
     return widget;
   }
 
-  async updateWidget(id: string, data: Partial<DashboardWidget>): Promise<DashboardWidget> {
+  async updateWidget(
+    id: string,
+    data: Partial<DashboardWidget>
+  ): Promise<DashboardWidget> {
     const widget = this.dashboardWidgets.get(id);
     if (!widget) {
-      throw new NotFoundError('DashboardWidget', id);
+      throw new NotFoundError("DashboardWidget", id);
     }
-    
+
     const updatedWidget: DashboardWidget = {
       ...widget,
       ...data,
@@ -246,7 +266,7 @@ export class SystemRepositoryImpl implements ISystemRepository {
   async deleteWidget(id: string): Promise<{ success: boolean }> {
     const deleted = this.dashboardWidgets.delete(id);
     if (!deleted) {
-      throw new NotFoundError('DashboardWidget', id);
+      throw new NotFoundError("DashboardWidget", id);
     }
     return { success: true };
   }
@@ -254,14 +274,14 @@ export class SystemRepositoryImpl implements ISystemRepository {
   async resetUserWidgets(userId: string): Promise<DashboardWidget[]> {
     // Delete all existing widgets for this user
     Array.from(this.dashboardWidgets.values())
-      .filter(w => w.userId === userId)
-      .forEach(w => this.dashboardWidgets.delete(w.id));
-    
+      .filter((w) => w.userId === userId)
+      .forEach((w) => this.dashboardWidgets.delete(w.id));
+
     // Create default widget layout
     const defaultWidgets: InsertDashboardWidget[] = [
       {
         userId,
-        widgetType: 'quick_stats',
+        widgetType: "quick_stats",
         displayOrder: 0,
         gridPosition: { row: 0, col: 0, width: 2, height: 1 },
         settings: {},
@@ -269,7 +289,7 @@ export class SystemRepositoryImpl implements ISystemRepository {
       },
       {
         userId,
-        widgetType: 'recent_pages',
+        widgetType: "recent_pages",
         displayOrder: 1,
         gridPosition: { row: 1, col: 0, width: 1, height: 2 },
         settings: { limit: 5 },
@@ -277,7 +297,7 @@ export class SystemRepositoryImpl implements ISystemRepository {
       },
       {
         userId,
-        widgetType: 'recent_contacts',
+        widgetType: "recent_contacts",
         displayOrder: 2,
         gridPosition: { row: 1, col: 1, width: 1, height: 2 },
         settings: { limit: 5 },
@@ -285,29 +305,29 @@ export class SystemRepositoryImpl implements ISystemRepository {
       },
       {
         userId,
-        widgetType: 'quick_actions',
+        widgetType: "quick_actions",
         displayOrder: 3,
         gridPosition: { row: 3, col: 0, width: 2, height: 1 },
         settings: {},
         isVisible: true,
       },
     ];
-    
+
     const widgets: DashboardWidget[] = [];
     for (const widgetData of defaultWidgets) {
       const widget = await this.createWidget(widgetData);
       widgets.push(widget);
     }
-    
+
     return widgets;
   }
 
   async updateWidgetLayout(
-    userId: string, 
+    userId: string,
     widgets: Array<{ id: string; displayOrder: number; gridPosition?: any }>
   ): Promise<DashboardWidget[]> {
     const updatedWidgets: DashboardWidget[] = [];
-    
+
     for (const widgetUpdate of widgets) {
       const widget = this.dashboardWidgets.get(widgetUpdate.id);
       if (widget && widget.userId === userId) {
@@ -318,8 +338,10 @@ export class SystemRepositoryImpl implements ISystemRepository {
         updatedWidgets.push(updated);
       }
     }
-    
-    return updatedWidgets.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+
+    return updatedWidgets.sort(
+      (a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)
+    );
   }
 
   // System Settings Methods
@@ -332,25 +354,26 @@ export class SystemRepositoryImpl implements ISystemRepository {
   }
 
   async getSettingsByCategory(category: string): Promise<SystemSetting[]> {
-    return Array.from(this.systemSettings.values())
-      .filter(setting => setting.category === category);
+    return Array.from(this.systemSettings.values()).filter(
+      (setting) => setting.category === category
+    );
   }
 
   async upsertSetting(data: InsertSystemSetting): Promise<SystemSetting> {
     const existing = this.systemSettings.get(data.key);
     const id = existing?.id ?? randomUUID();
     const now = new Date();
-    
+
     const setting: SystemSetting = {
       ...data,
       id,
       value: data.value ?? null,
-      category: data.category ?? 'general',
+      category: data.category ?? "general",
       description: data.description ?? null,
       updatedAt: now,
       updatedBy: data.updatedBy ?? null,
     };
-    
+
     this.systemSettings.set(data.key, setting);
     return setting;
   }
@@ -358,7 +381,7 @@ export class SystemRepositoryImpl implements ISystemRepository {
   async deleteSetting(key: string): Promise<{ success: boolean }> {
     const deleted = this.systemSettings.delete(key);
     if (!deleted) {
-      throw new NotFoundError('SystemSetting', key);
+      throw new NotFoundError("SystemSetting", key);
     }
     return { success: true };
   }

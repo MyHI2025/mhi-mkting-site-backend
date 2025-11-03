@@ -1,4 +1,4 @@
-import type { Contact } from "@myhealthintegral/shared";
+import type { Contact } from "@myhi2025/shared";
 
 interface ZohoConfig {
   clientId: string;
@@ -41,7 +41,7 @@ export class ZohoCRMService {
     const clientId = process.env.ZOHO_CLIENT_ID;
     const clientSecret = process.env.ZOHO_CLIENT_SECRET;
     const refreshToken = process.env.ZOHO_REFRESH_TOKEN;
-    const dataCenter = process.env.ZOHO_DATA_CENTER || 'com';
+    const dataCenter = process.env.ZOHO_DATA_CENTER || "com";
 
     if (clientId && clientSecret && refreshToken) {
       this.config = {
@@ -54,18 +54,20 @@ export class ZohoCRMService {
   }
 
   private getAuthUrl(): string {
-    if (!this.config) throw new Error('Zoho CRM not configured');
+    if (!this.config) throw new Error("Zoho CRM not configured");
     return `https://accounts.zoho.${this.config.dataCenter}/oauth/v2/token`;
   }
 
   private getApiUrl(): string {
-    if (!this.config) throw new Error('Zoho CRM not configured');
+    if (!this.config) throw new Error("Zoho CRM not configured");
     return `https://www.zohoapis.${this.config.dataCenter}/crm/v2`;
   }
 
   private async refreshAccessToken(): Promise<string> {
     if (!this.config) {
-      throw new Error('Zoho CRM credentials not configured. Please set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, ZOHO_REFRESH_TOKEN, and ZOHO_DATA_CENTER in Secrets.');
+      throw new Error(
+        "Zoho CRM credentials not configured. Please set ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, ZOHO_REFRESH_TOKEN, and ZOHO_DATA_CENTER in Secrets."
+      );
     }
 
     try {
@@ -73,13 +75,13 @@ export class ZohoCRMService {
         refresh_token: this.config.refreshToken,
         client_id: this.config.clientId,
         client_secret: this.config.clientSecret,
-        grant_type: 'refresh_token',
+        grant_type: "refresh_token",
       });
 
       const response = await fetch(this.getAuthUrl(), {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          "Content-Type": "application/x-www-form-urlencoded",
         },
         body: params.toString(),
       });
@@ -91,11 +93,11 @@ export class ZohoCRMService {
 
       const data: ZohoTokenResponse = await response.json();
       this.accessToken = data.access_token;
-      this.tokenExpiry = Date.now() + (data.expires_in * 1000);
+      this.tokenExpiry = Date.now() + data.expires_in * 1000;
 
       return this.accessToken;
     } catch (error) {
-      console.error('Error refreshing Zoho access token:', error);
+      console.error("Error refreshing Zoho access token:", error);
       throw error;
     }
   }
@@ -117,17 +119,19 @@ export class ZohoCRMService {
       Company: contact.organization || undefined,
       City: contact.city || undefined,
       Country: contact.country || undefined,
-      Lead_Source: 'Website Contact Form',
+      Lead_Source: "Website Contact Form",
       Description: `User Type: ${contact.userType}\n\nMessage:\n${contact.message}`,
-      Lead_Status: 'Not Contacted',
+      Lead_Status: "Not Contacted",
     };
   }
 
-  async createLead(contact: Contact): Promise<{ success: boolean; id?: string; error?: string }> {
+  async createLead(
+    contact: Contact
+  ): Promise<{ success: boolean; id?: string; error?: string }> {
     if (!this.config) {
       return {
         success: false,
-        error: 'Zoho CRM not configured. Please add credentials in Secrets.',
+        error: "Zoho CRM not configured. Please add credentials in Secrets.",
       };
     }
 
@@ -136,30 +140,30 @@ export class ZohoCRMService {
       const leadData = this.mapContactToZohoLead(contact);
 
       const response = await fetch(`${this.getApiUrl()}/Leads`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Zoho-oauthtoken ${accessToken}`,
-          'Content-Type': 'application/json',
+          Authorization: `Zoho-oauthtoken ${accessToken}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           data: [leadData],
-          trigger: ['approval', 'workflow', 'blueprint'],
+          trigger: ["approval", "workflow", "blueprint"],
         }),
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        console.error('Zoho API error:', result);
+        console.error("Zoho API error:", result);
         return {
           success: false,
-          error: result.message || 'Failed to create lead in Zoho CRM',
+          error: result.message || "Failed to create lead in Zoho CRM",
         };
       }
 
       if (result.data && result.data[0]) {
         const leadInfo = result.data[0];
-        if (leadInfo.code === 'SUCCESS') {
+        if (leadInfo.code === "SUCCESS") {
           return {
             success: true,
             id: leadInfo.details.id,
@@ -167,25 +171,27 @@ export class ZohoCRMService {
         } else {
           return {
             success: false,
-            error: leadInfo.message || 'Failed to create lead',
+            error: leadInfo.message || "Failed to create lead",
           };
         }
       }
 
       return {
         success: false,
-        error: 'Unexpected response from Zoho CRM',
+        error: "Unexpected response from Zoho CRM",
       };
     } catch (error) {
-      console.error('Error creating Zoho lead:', error);
+      console.error("Error creating Zoho lead:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
 
-  async createLeads(contacts: Contact[]): Promise<{ success: number; failed: number; errors: string[] }> {
+  async createLeads(
+    contacts: Contact[]
+  ): Promise<{ success: number; failed: number; errors: string[] }> {
     const results = {
       success: 0,
       failed: 0,

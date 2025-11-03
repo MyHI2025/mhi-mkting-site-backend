@@ -1,5 +1,9 @@
-import type { User, InsertUser, Role, InsertRole } from "@myhealthintegral/shared";
-import { IBaseRepository, NotFoundError, DuplicateError } from "./base.repository";
+import type { User, InsertUser, Role, InsertRole } from "@myhi2025/shared";
+import {
+  IBaseRepository,
+  NotFoundError,
+  DuplicateError,
+} from "./base.repository";
 
 /**
  * Users Repository Interface
@@ -14,16 +18,22 @@ export interface IUsersRepository {
   createUser(data: InsertUser): Promise<User>;
   updateUser(id: string, data: Partial<User>): Promise<User>;
   deleteUser(id: string): Promise<{ success: boolean; message: string }>;
-  
+
   // Role management
   findRoleById(id: string): Promise<Role | null>;
   findRoleByName(name: string): Promise<Role | null>;
   getAllRoles(): Promise<Role[]>;
   createRole(data: InsertRole): Promise<Role>;
   updateRole(id: string, data: Partial<Role>): Promise<Role>;
-  
+
   // User-Role associations
   getUserRoles(userId: string): Promise<Role[]>;
-  assignRoleToUser(userId: string, roleId: string): Promise<{ success: boolean }>;
-  removeRoleFromUser(userId: string, roleId: string): Promise<{ success: boolean }>;
+  assignRoleToUser(
+    userId: string,
+    roleId: string
+  ): Promise<{ success: boolean }>;
+  removeRoleFromUser(
+    userId: string,
+    roleId: string
+  ): Promise<{ success: boolean }>;
 }

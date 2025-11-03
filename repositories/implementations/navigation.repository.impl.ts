@@ -1,7 +1,7 @@
-import { INavigationRepository } from '../navigation.repository';
-import { NotFoundError } from '../base.repository';
-import type { NavigationItem, InsertNavigationItem } from '@myhealthintegral/shared';
-import { randomUUID } from 'crypto';
+import { INavigationRepository } from "../navigation.repository";
+import { NotFoundError } from "../base.repository";
+import type { NavigationItem, InsertNavigationItem } from "@myhi2025/shared";
+import { randomUUID } from "crypto";
 
 export class NavigationRepositoryImpl implements INavigationRepository {
   private navigationItems: Map<string, NavigationItem>;
@@ -15,29 +15,34 @@ export class NavigationRepositoryImpl implements INavigationRepository {
   }
 
   async getAllNavigationItems(): Promise<NavigationItem[]> {
-    return Array.from(this.navigationItems.values())
-      .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+    return Array.from(this.navigationItems.values()).sort(
+      (a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0)
+    );
   }
 
   async getPublishedNavigationItems(): Promise<NavigationItem[]> {
     return Array.from(this.navigationItems.values())
-      .filter(item => item.isVisible)
+      .filter((item) => item.isVisible)
       .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
   }
 
-  async getNavigationItemsByParent(parentId: string | null): Promise<NavigationItem[]> {
+  async getNavigationItemsByParent(
+    parentId: string | null
+  ): Promise<NavigationItem[]> {
     return Array.from(this.navigationItems.values())
-      .filter(item => item.parentId === parentId)
+      .filter((item) => item.parentId === parentId)
       .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
   }
 
-  async createNavigationItem(data: InsertNavigationItem): Promise<NavigationItem> {
+  async createNavigationItem(
+    data: InsertNavigationItem
+  ): Promise<NavigationItem> {
     const id = randomUUID();
     const item: NavigationItem = {
       ...data,
       id,
       href: data.href || null,
-      target: data.target || '_self',
+      target: data.target || "_self",
       displayOrder: data.displayOrder || 0,
       parentId: data.parentId || null,
       isVisible: true,
@@ -47,35 +52,43 @@ export class NavigationRepositoryImpl implements INavigationRepository {
     return item;
   }
 
-  async updateNavigationItem(id: string, data: Partial<NavigationItem>): Promise<NavigationItem> {
+  async updateNavigationItem(
+    id: string,
+    data: Partial<NavigationItem>
+  ): Promise<NavigationItem> {
     const item = this.navigationItems.get(id);
     if (!item) {
-      throw new NotFoundError('NavigationItem', id);
+      throw new NotFoundError("NavigationItem", id);
     }
-    
+
     const updatedItem: NavigationItem = { ...item, ...data, id };
     this.navigationItems.set(id, updatedItem);
     return updatedItem;
   }
 
-  async deleteNavigationItem(id: string): Promise<{ success: boolean; message: string }> {
+  async deleteNavigationItem(
+    id: string
+  ): Promise<{ success: boolean; message: string }> {
     const item = this.navigationItems.get(id);
     if (!item) {
-      throw new NotFoundError('NavigationItem', id);
+      throw new NotFoundError("NavigationItem", id);
     }
 
-    const children = Array.from(this.navigationItems.values())
-      .filter(navItem => navItem.parentId === id);
-    
-    children.forEach(child => {
+    const children = Array.from(this.navigationItems.values()).filter(
+      (navItem) => navItem.parentId === id
+    );
+
+    children.forEach((child) => {
       this.navigationItems.delete(child.id);
     });
-    
+
     this.navigationItems.delete(id);
-    return { success: true, message: 'Navigation item deleted successfully' };
+    return { success: true, message: "Navigation item deleted successfully" };
   }
 
-  async reorderNavigationItems(items: { id: string; order: number }[]): Promise<{ success: boolean; message: string }> {
+  async reorderNavigationItems(
+    items: { id: string; order: number }[]
+  ): Promise<{ success: boolean; message: string }> {
     items.forEach(({ id, order }) => {
       const item = this.navigationItems.get(id);
       if (item) {
@@ -86,7 +99,10 @@ export class NavigationRepositoryImpl implements INavigationRepository {
         this.navigationItems.set(id, updatedItem);
       }
     });
-    return { success: true, message: 'Navigation items reordered successfully' };
+    return {
+      success: true,
+      message: "Navigation items reordered successfully",
+    };
   }
 }
 
