@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 import { type User, type Role, type Permission } from "@myhi2025/shared";
+import { systemRepository } from "./repositories/implementations/system.repository.impl";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -144,7 +145,7 @@ export const requirePermission = (resource: string, action: string) => {
         },
         ipAddress: req.ip || null,
         userAgent: req.get("User-Agent") || null,
-        createdAt: new Date(),
+        // createdAt: new Date(),
       });
 
       return res.status(403).json({
@@ -178,7 +179,7 @@ export const refreshAccessToken = async (
   }
 
   // Then check if session exists and is not expired
-  const session = await storage.findSessionByToken(refreshToken);
+  const session = await systemRepository.findSessionByToken(refreshToken);
   if (!session) {
     return null;
   }
@@ -214,12 +215,12 @@ export const logoutUser = async (refreshToken: string): Promise<boolean> => {
       details: { token_invalidated: true },
       ipAddress: null,
       userAgent: null,
-      createdAt: new Date(),
+      // createdAt: new Date(),
     });
   }
 
   const result = await storage.deleteSession(refreshToken);
-  return result.success;
+  return result;
 };
 
 export const logoutAllUserSessions = async (
@@ -234,7 +235,7 @@ export const logoutAllUserSessions = async (
     details: { all_sessions_invalidated: true },
     ipAddress: null,
     userAgent: null,
-    createdAt: new Date(),
+    // createdAt: new Date(),
   });
 
   // Note: deleteUserSessions not yet implemented in storage
@@ -259,7 +260,7 @@ export const logUserAction = async (
     details,
     ipAddress: req.ip || null,
     userAgent: req.get("User-Agent") || null,
-    createdAt: new Date(),
+    // createdAt: new Date(),
   });
 };
 
@@ -316,7 +317,7 @@ export const requirePasswordChange = async (
     details: { reason: "default_password_usage" },
     ipAddress: null,
     userAgent: "System",
-    createdAt: new Date(),
+    // createdAt: new Date(),
   });
 
   return true;
