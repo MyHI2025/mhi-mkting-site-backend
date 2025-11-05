@@ -503,6 +503,8 @@ async function initializeRealArticles(adminUserId: string) {
     for (const article of realArticles) {
       await storage.createPage({
         ...article,
+        topicTags: article.topicTags.join(", "),
+        targetUserTypes: article.targetUserTypes.join(", "),
         pageType: "blog",
         metaTitle: `${article.title} | My Health Integral Blog`,
         metaDescription: article.description,
