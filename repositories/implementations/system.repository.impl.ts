@@ -44,7 +44,7 @@ export class SystemRepositoryImpl implements ISystemRepository {
     const id = randomUUID();
     const now = new Date();
     const theme: ThemeSettings = {
-      ...data,
+      ...data as ThemeSettings,
       id,
       settings: data.settings || {},
       isActive: false,
@@ -231,12 +231,12 @@ export class SystemRepositoryImpl implements ISystemRepository {
     const id = randomUUID();
     const now = new Date();
     const widget: DashboardWidget = {
-      ...data,
+      ...data as DashboardWidget,
       id,
-      displayOrder: data.displayOrder ?? null,
-      gridPosition: data.gridPosition || {},
-      settings: data.settings || {},
-      isVisible: data.isVisible ?? true,
+      displayOrder: data.displayOrder as number ?? null,
+      gridPosition: data.gridPosition as string || {},
+      settings: data.settings as string || {},
+      isVisible: data.isVisible as boolean ?? true,
       createdAt: now,
       updatedAt: now,
     };
@@ -360,21 +360,21 @@ export class SystemRepositoryImpl implements ISystemRepository {
   }
 
   async upsertSetting(data: InsertSystemSetting): Promise<SystemSetting> {
-    const existing = this.systemSettings.get(data.key);
+    const existing = this.systemSettings.get(data.key as string);
     const id = existing?.id ?? randomUUID();
     const now = new Date();
 
     const setting: SystemSetting = {
-      ...data,
+      ...data as SystemSetting,
       id,
-      value: data.value ?? null,
-      category: data.category ?? "general",
-      description: data.description ?? null,
+      value: data.value as string ?? null,
+      category: data.category as string ?? "general",
+      description: data.description as string ?? null,
       updatedAt: now,
-      updatedBy: data.updatedBy ?? null,
+      updatedBy: data.updatedBy as string ?? null,
     };
 
-    this.systemSettings.set(data.key, setting);
+    this.systemSettings.set(data.key as string, setting);
     return setting;
   }
 
