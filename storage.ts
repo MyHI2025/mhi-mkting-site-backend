@@ -266,7 +266,18 @@ export class DbStorage implements IStorage {
   }
 
   async createUser(user: InsertUser): Promise<User> {
-    const result = await db.insert(usersTable).values(user).returning();
+    const result = await db
+      .insert(usersTable)
+      .values(
+        user as {
+          username: string;
+          email: string;
+          password: string;
+          firstName?: string;
+          lastName?: string;
+        }
+      )
+      .returning();
     return result[0];
   }
 
@@ -311,7 +322,12 @@ export class DbStorage implements IStorage {
   }
 
   async createRole(role: InsertRole): Promise<Role> {
-    const result = await db.insert(rolesTable).values(role).returning();
+    const result = await db
+      .insert(rolesTable)
+      .values(
+        role as { name: string; description?: string; permissions?: string }
+      )
+      .returning();
     return result[0];
   }
 
@@ -401,7 +417,23 @@ export class DbStorage implements IStorage {
 
   // Contact management
   async createContact(contact: InsertContact): Promise<Contact> {
-    const result = await db.insert(contactsTable).values(contact).returning();
+    const result = await db
+      .insert(contactsTable)
+      .values(
+        contact as {
+          email: string;
+          firstName: string;
+          lastName: string;
+          title?: string;
+          phone?: string;
+          city?: string;
+          country?: string;
+          organization?: string;
+          userType: string;
+          message: string;
+        }
+      )
+      .returning();
     return result[0];
   }
 
@@ -518,7 +550,15 @@ export class DbStorage implements IStorage {
   ): Promise<NavigationItem> {
     const result = await db
       .insert(navigationItemsTable)
-      .values(item)
+      .values(
+        item as {
+          isplayOrder?: string;
+          parentId?: string;
+          label: string;
+          href?: string;
+          target?: string;
+        }
+      )
       .returning();
     return result[0];
   }
@@ -560,7 +600,22 @@ export class DbStorage implements IStorage {
   }
 
   async createTeamMember(member: InsertTeamMember): Promise<TeamMember> {
-    const result = await db.insert(teamMembersTable).values(member).returning();
+    const result = await db
+      .insert(teamMembersTable)
+      .values({
+        firstName: member.firstName as string,
+        lastName: member.lastName as string,
+        title: member.title as string,
+        displayOrder: Number(member.displayOrder),
+        isVisible: member.isVisible === "true",
+        role: member.role as string,
+        bio: member.bio as string,
+        photoUrl: member.photoUrl as string,
+        photoAlt: member.photoAlt as string,
+        linkedin: member.linkedin as string,
+        achievements: member.achievements as string,
+      })
+      .returning();
     return result[0];
   }
 
@@ -612,7 +667,9 @@ export class DbStorage implements IStorage {
   ): Promise<MediaPosition> {
     const result = await db
       .insert(mediaPositionsTable)
-      .values(position)
+      .values(
+        position as any
+      )
       .returning();
     return result[0];
   }
@@ -705,10 +762,10 @@ export class DbStorage implements IStorage {
   async upsertSetting(setting: InsertSystemSetting): Promise<SystemSetting> {
     const result = await db
       .insert(systemSettingsTable)
-      .values({ ...setting, updatedAt: new Date() })
+      .values({ ...setting as any, updatedAt: new Date() })
       .onConflictDoUpdate({
         target: systemSettingsTable.key,
-        set: { ...setting, updatedAt: new Date() },
+        set: { ...setting as any, updatedAt: new Date() },
       })
       .returning();
     return result[0];
@@ -809,7 +866,7 @@ export class DbStorage implements IStorage {
   async createTheme(settings: InsertThemeSettings): Promise<ThemeSettings> {
     const result = await db
       .insert(themeSettingsTable)
-      .values(settings)
+      .values(settings as any)
       .returning();
     return result[0];
   }
@@ -1107,10 +1164,10 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const now = new Date();
     const user: User = {
-      ...insertUser,
+      ...insertUser as any,
       id,
-      firstName: insertUser.firstName || null,
-      lastName: insertUser.lastName || null,
+      firstName: insertUser.firstName as string || null,
+      lastName: insertUser.lastName as string || null,
       isActive: true,
       lastLoginAt: null,
       createdAt: now,
@@ -1167,10 +1224,10 @@ export class MemStorage implements IStorage {
   async createRole(insertRole: InsertRole): Promise<Role> {
     const id = randomUUID();
     const role: Role = {
-      ...insertRole,
+      ...insertRole as Role,
       id,
-      description: insertRole.description || null,
-      permissions: insertRole.permissions || [],
+      description: insertRole.description as string || null,
+      permissions: insertRole.permissions as [] || [],
       createdAt: new Date(),
     };
     this.roles.set(id, role);
@@ -1282,10 +1339,10 @@ export class MemStorage implements IStorage {
   async createContact(insertContact: InsertContact): Promise<Contact> {
     const id = randomUUID();
     const contact: Contact = {
-      ...insertContact,
+      ...insertContact as Contact,
       id,
-      phone: insertContact.phone || null,
-      organization: insertContact.organization || null,
+      phone: insertContact.phone as string || null,
+      organization: insertContact.organization as string || null,
       createdAt: new Date(),
     };
     this.contacts.set(id, contact);
@@ -1313,18 +1370,18 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const now = new Date();
     const page: Page = {
-      ...insertPage,
+      ...insertPage as Page,
       id,
-      pageType: insertPage.pageType || "marketing",
-      description: insertPage.description || null,
-      category: insertPage.category || null,
-      metaTitle: insertPage.metaTitle || null,
-      metaDescription: insertPage.metaDescription || null,
-      featuredImage: insertPage.featuredImage || null,
+      pageType: insertPage.pageType as string || "marketing",
+      description: insertPage.description as string || null,
+      category: insertPage.category as string || null,
+      metaTitle: insertPage.metaTitle as string || null,
+      metaDescription: insertPage.metaDescription as string || null,
+      featuredImage: insertPage.featuredImage as string || null,
       author: null,
-      isPublished: insertPage.isPublished ?? false,
+      isPublished: insertPage.isPublished as boolean ?? false,
       publishedAt: null,
-      metadata: insertPage.metadata || null,
+      metadata: insertPage.metadata as string || null,
       createdAt: now,
       updatedAt: now,
       createdBy: null,
@@ -1415,12 +1472,12 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const now = new Date();
     const section: ContentSection = {
-      ...insertSection,
+      ...insertSection as ContentSection,
       id,
-      title: insertSection.title || null,
-      subtitle: insertSection.subtitle || null,
+      title: insertSection.title as string || null,
+      subtitle: insertSection.subtitle as string || null,
       content: insertSection.content || {},
-      displayOrder: insertSection.displayOrder || null,
+      displayOrder: insertSection.displayOrder as number || null,
       isVisible: true,
       createdAt: now,
       updatedAt: now,
@@ -1489,11 +1546,11 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const now = new Date();
     const node: ContentNode = {
-      ...insertNode,
+      ...insertNode as ContentNode,
       id,
       content: insertNode.content || {},
-      displayOrder: insertNode.displayOrder || null,
-      parentId: insertNode.parentId || null,
+      displayOrder: insertNode.displayOrder || null as any,
+      parentId: insertNode.parentId || null as any,
       styles: insertNode.styles || {},
       isVisible: true,
       createdAt: now,
@@ -1575,11 +1632,11 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const now = new Date();
     const block: ContentBlock = {
-      ...insertBlock,
+      ...insertBlock as ContentBlock,
       id,
-      title: insertBlock.title || null,
+      title: insertBlock.title as string || null,
       content: insertBlock.content || {},
-      displayOrder: insertBlock.displayOrder || null,
+      displayOrder: insertBlock.displayOrder as number || null,
       isVisible: true,
       createdAt: now,
       updatedAt: now,
@@ -1634,10 +1691,10 @@ export class MemStorage implements IStorage {
   async createMediaAsset(insertAsset: InsertMediaAsset): Promise<MediaAsset> {
     const id = randomUUID();
     const asset: MediaAsset = {
-      ...insertAsset,
+      ...insertAsset as MediaAsset,
       id,
-      altText: insertAsset.altText || null,
-      caption: insertAsset.caption || null,
+      altText: insertAsset.altText as string || null,
+      caption: insertAsset.caption as string || null,
       createdAt: new Date(),
       uploadedBy: null,
     };
@@ -1691,12 +1748,12 @@ export class MemStorage implements IStorage {
   ): Promise<NavigationItem> {
     const id = randomUUID();
     const item: NavigationItem = {
-      ...insertItem,
+      ...insertItem as NavigationItem,
       id,
-      href: insertItem.href || null,
-      target: insertItem.target || "_self",
-      displayOrder: insertItem.displayOrder || 0,
-      parentId: insertItem.parentId || null,
+      href: insertItem.href as string || null,
+      target: insertItem.target as string || "_self",
+      displayOrder: insertItem.displayOrder as number || 0,
+      parentId: insertItem.parentId as string || null,
       isVisible: true,
       createdAt: new Date(),
     };
@@ -1778,7 +1835,7 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const now = new Date();
     const theme: ThemeSettings = {
-      ...insertTheme,
+      ...insertTheme as ThemeSettings,
       id,
       settings: insertTheme.settings || {},
       isActive: false,
@@ -1852,20 +1909,22 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const now = new Date();
     const member: TeamMember = {
-      name: insertMember.name,
-      role: insertMember.role,
+      firstName: insertMember.firstName as string,
+      lastName: insertMember.lastName as string,
+      role: insertMember.role as string,
       id,
-      bio: insertMember.bio ?? null,
-      photoUrl: insertMember.photoUrl ?? null,
-      photoAlt: insertMember.photoAlt ?? null,
-      linkedin: insertMember.linkedin ?? null,
-      achievements: insertMember.achievements || [],
-      displayOrder: insertMember.displayOrder ?? 0,
-      isVisible: insertMember.isVisible ?? true,
+      bio: insertMember.bio as string ?? null,
+      photoUrl: insertMember.photoUrl as string ?? null,
+      photoAlt: insertMember.photoAlt as string ?? null,
+      linkedin: insertMember.linkedin as string ?? null,
+      achievements: insertMember.achievements as string || [],
+      displayOrder: insertMember.displayOrder as number ?? 0,
+      isVisible: insertMember.isVisible as boolean ?? true,
       createdAt: now,
       updatedAt: now,
       createdBy: null,
       updatedBy: null,
+      title: insertMember.title as string ?? null,
     };
     this.teamMembers.set(id, member);
     return member;
@@ -1921,16 +1980,16 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const now = new Date();
     const newPosition: MediaPosition = {
-      positionKey: position.positionKey,
-      label: position.label,
-      category: position.category,
+      positionKey: position.positionKey as string,
+      label: position.label as string,
+      category: position.category as string,
       id,
-      description: position.description ?? null,
-      mediaUrl: position.mediaUrl ?? null,
-      mediaAlt: position.mediaAlt ?? null,
-      mediaAssetId: position.mediaAssetId ?? null,
-      isActive: position.isActive ?? true,
-      displayOrder: position.displayOrder ?? 0,
+      description: position.description as string ?? null,
+      mediaUrl: position.mediaUrl as string ?? null,
+      mediaAlt: position.mediaAlt as string ?? null,
+      mediaAssetId: position.mediaAssetId as string ?? null,
+      isActive: position.isActive as boolean ?? true,
+      displayOrder: position.displayOrder as number ?? 0,
       createdAt: now,
       updatedAt: now,
       updatedBy: null,
@@ -1988,15 +2047,15 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const now = new Date();
     const newVideo: VideoContent = {
-      ...video,
+      ...video as VideoContent,
       id,
-      description: video.description ?? null,
-      thumbnailUrl: video.thumbnailUrl ?? null,
-      duration: video.duration ?? null,
-      category: video.category ?? "Webinar",
-      isPublished: video.isPublished ?? false,
-      views: video.views ?? 0,
-      displayOrder: video.displayOrder ?? 0,
+      description: video.description as string ?? null,
+      thumbnailUrl: video.thumbnailUrl as string ?? null,
+      duration: video.duration as string ?? null,
+      category: video.category as string ?? "Webinar",
+      isPublished: video.isPublished as boolean ?? false,
+      views: video.views as number ?? 0,
+      displayOrder: video.displayOrder as number ?? 0,
       createdAt: now,
       updatedAt: now,
       createdBy: null,
@@ -2092,21 +2151,21 @@ export class MemStorage implements IStorage {
   }
 
   async upsertSetting(setting: InsertSystemSetting): Promise<SystemSetting> {
-    const existing = this.systemSettings.get(setting.key);
+    const existing = this.systemSettings.get(setting.key as string);
     const id = existing?.id ?? randomUUID();
     const now = new Date();
 
     const newSetting: SystemSetting = {
-      ...setting,
+      ...setting as SystemSetting,
       id,
-      value: setting.value ?? null,
-      category: setting.category ?? "general",
-      description: setting.description ?? null,
+      value: setting.value as string ?? null ,
+      category: setting.category as string ?? "general",
+      description: setting.description as string ?? null,
       updatedAt: now,
-      updatedBy: setting.updatedBy ?? null,
+      updatedBy: setting.updatedBy as string ?? null,
     };
 
-    this.systemSettings.set(setting.key, newSetting);
+    this.systemSettings.set(setting.key as string, newSetting);
     return newSetting;
   }
 

@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@myhi2025/shared':
-        specifier: ^1.0.1
-        version: 1.0.1(@libsql/client-wasm@0.15.15)(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)
+        specifier: ^1.0.6
+        version: 1.0.6(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)
       '@neondatabase/serverless':
         specifier: ^0.10.4
         version: 0.10.4
@@ -27,11 +27,11 @@ importers:
         specifier: ^17.2.3
         version: 17.2.3
       drizzle-orm:
-        specifier: ^0.39.1
-        version: 0.39.3(@libsql/client-wasm@0.15.15)(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)
+        specifier: 0.39.3
+        version: 0.39.3(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)
       drizzle-zod:
         specifier: ^0.7.0
-        version: 0.7.1(drizzle-orm@0.39.3(@libsql/client-wasm@0.15.15)(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3))(zod@3.25.76)
+        version: 0.7.1(drizzle-orm@0.39.3(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3))(zod@3.25.76)
       express:
         specifier: ^4.21.2
         version: 4.21.2
@@ -133,8 +133,8 @@ importers:
 
 packages:
 
-  '@acemir/cssom@0.9.19':
-    resolution: {integrity: sha512-Pp2gAQXPZ2o7lt4j0IMwNRXqQ3pagxtDj5wctL5U2Lz4oV0ocDNlkgx4DpxfyKav4S/bePuI+SMqcBSUHLy9kg==}
+  '@acemir/cssom@0.9.20':
+    resolution: {integrity: sha512-YUSA5jW8qn/c6nZUlFsn2Nt5qFFRBcGTgL9CzbiZbJCtEFY0Nv/ycO3BHT9tLjus9++zOYWe5mLCRIesuay25g==}
 
   '@asamuzakjp/css-color@4.0.5':
     resolution: {integrity: sha512-lMrXidNhPGsDjytDy11Vwlb6OIGrT3CmLg3VWNFyWkLWtijKl7xjvForlh8vuj0SHGjgl4qZEQzUmYTeQA2JFQ==}
@@ -479,16 +479,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@libsql/client-wasm@0.15.15':
-    resolution: {integrity: sha512-ah71HHAsywWRSinJg7SKbJc+mTIgw7wHPYLE9DfW79wa+CSQXX1rEbrDNQx0HvHC1YFd2IpVpVASBFlqh54vVA==}
-    bundledDependencies:
-      - '@libsql/libsql-wasm-experimental'
-
-  '@libsql/core@0.15.15':
-    resolution: {integrity: sha512-C88Z6UKl+OyuKKPwz224riz02ih/zHYI3Ho/LAcVOgjsunIRZoBw7fjRfaH9oPMmSNeQfhGklSG2il1URoOIsA==}
-
-  '@myhi2025/shared@1.0.1':
-    resolution: {integrity: sha512-J/MdAAzjjzbR+oWTMGrOtQlrwBPFvZfb/YHOb8CnDKfcCgVdyauPilnhO5WDqG9SXh4ZAfBafhC0dmmroAOLrw==, tarball: https://npm.pkg.github.com/download/@myhi2025/shared/1.0.1/91213fea9ee7048fdb0d755df32a1034459787dc}
+  '@myhi2025/shared@1.0.6':
+    resolution: {integrity: sha512-pikU77YVINhFm54zxahOM+s2scthZG4p5N/gQOnikH1vejHC6XsLuqkoCSNgC6vJL4T+Y5SnFFVm7rIK8DbroA==, tarball: https://npm.pkg.github.com/download/@myhi2025/shared/1.0.6/ea8382549d2794eaee44a65cea3a6f0d68282811}
 
   '@neondatabase/serverless@0.10.4':
     resolution: {integrity: sha512-2nZuh3VUO9voBauuh+IGYRhGU/MskWHt1IuZvHcJw6GLjDgtqj/KViKo7SIrLdGLdot7vFbiRRw+BgEy3wT9HA==}
@@ -735,96 +727,6 @@ packages:
     resolution: {integrity: sha512-/B4e/4pwnx25QwD5xXgdpo1S+077a2VZdosXbItE/oNmUgQwZydGDz9qJYmnQl/b+5IX0rLfwRhrPnroGtrg8Q==}
     hasBin: true
 
-  drizzle-orm@0.35.3:
-    resolution: {integrity: sha512-Uv6N+b36x4BaZlxc96e+ag7RnMapBLGhc4SSi2F7RDwqYJipWjaU/P68RUp1FbW9r+mxoDp8nMz2Eece8PJxfA==}
-    peerDependencies:
-      '@aws-sdk/client-rds-data': '>=3'
-      '@cloudflare/workers-types': '>=3'
-      '@electric-sql/pglite': '>=0.1.1'
-      '@libsql/client': '>=0.10.0'
-      '@libsql/client-wasm': '>=0.10.0'
-      '@neondatabase/serverless': '>=0.1'
-      '@op-engineering/op-sqlite': '>=2'
-      '@opentelemetry/api': ^1.4.1
-      '@planetscale/database': '>=1'
-      '@prisma/client': '*'
-      '@tidbcloud/serverless': '*'
-      '@types/better-sqlite3': '*'
-      '@types/pg': '*'
-      '@types/react': '>=18'
-      '@types/sql.js': '*'
-      '@vercel/postgres': '>=0.8.0'
-      '@xata.io/client': '*'
-      better-sqlite3: '>=7'
-      bun-types: '*'
-      expo-sqlite: '>=13.2.0'
-      knex: '*'
-      kysely: '*'
-      mysql2: '>=2'
-      pg: '>=8'
-      postgres: '>=3'
-      prisma: '*'
-      react: '>=18'
-      sql.js: '>=1'
-      sqlite3: '>=5'
-    peerDependenciesMeta:
-      '@aws-sdk/client-rds-data':
-        optional: true
-      '@cloudflare/workers-types':
-        optional: true
-      '@electric-sql/pglite':
-        optional: true
-      '@libsql/client':
-        optional: true
-      '@neondatabase/serverless':
-        optional: true
-      '@op-engineering/op-sqlite':
-        optional: true
-      '@opentelemetry/api':
-        optional: true
-      '@planetscale/database':
-        optional: true
-      '@prisma/client':
-        optional: true
-      '@tidbcloud/serverless':
-        optional: true
-      '@types/better-sqlite3':
-        optional: true
-      '@types/pg':
-        optional: true
-      '@types/react':
-        optional: true
-      '@types/sql.js':
-        optional: true
-      '@vercel/postgres':
-        optional: true
-      '@xata.io/client':
-        optional: true
-      better-sqlite3:
-        optional: true
-      bun-types:
-        optional: true
-      expo-sqlite:
-        optional: true
-      knex:
-        optional: true
-      kysely:
-        optional: true
-      mysql2:
-        optional: true
-      pg:
-        optional: true
-      postgres:
-        optional: true
-      prisma:
-        optional: true
-      react:
-        optional: true
-      sql.js:
-        optional: true
-      sqlite3:
-        optional: true
-
   drizzle-orm@0.39.3:
     resolution: {integrity: sha512-EZ8ZpYvDIvKU9C56JYLOmUskazhad+uXZCTCRN4OnRMsL+xAJ05dv1eCpAG5xzhsm1hqiuC5kAZUCS924u2DTw==}
     peerDependencies:
@@ -910,12 +812,6 @@ packages:
         optional: true
       sqlite3:
         optional: true
-
-  drizzle-zod@0.5.1:
-    resolution: {integrity: sha512-C/8bvzUH/zSnVfwdSibOgFjLhtDtbKYmkbPbUCq46QZyZCH6kODIMSOgZ8R7rVjoI+tCj3k06MRJMDqsIeoS4A==}
-    peerDependencies:
-      drizzle-orm: '>=0.23.13'
-      zod: '*'
 
   drizzle-zod@0.7.1:
     resolution: {integrity: sha512-nZzALOdz44/AL2U005UlmMqaQ1qe5JfanvLujiTHiiT8+vZJTBFhj3pY4Vk+L6UWyKFfNmLhk602Hn4kCTynKQ==}
@@ -1101,9 +997,6 @@ packages:
   isomorphic-dompurify@2.31.0:
     resolution: {integrity: sha512-/XPACpfVJeEiy28UgkBWUWdhgKN8xwFYkoVFsqrcSJJ5pXZ3HStuF3ih/Hr8PwhCXHqFAys+b4tcgw0pbUT4rw==}
     engines: {node: '>=20.19.5'}
-
-  js-base64@3.7.8:
-    resolution: {integrity: sha512-hNngCeKxIUQiEUN3GPJOkz4wF/YvdUdbNL9hsBcMQTkKzboD7T/q3OYOuuPZLUE6dBxSGpwhk5mwuDud7JVAow==}
 
   jsdom@27.1.0:
     resolution: {integrity: sha512-Pcfm3eZ+eO4JdZCXthW9tCDT3nF4K+9dmeZ+5X39n+Kqz0DDIABRP5CAEOHRFZk8RGuC2efksTJxrjp8EXCunQ==}
@@ -1621,7 +1514,7 @@ packages:
 
 snapshots:
 
-  '@acemir/cssom@0.9.19': {}
+  '@acemir/cssom@0.9.20': {}
 
   '@asamuzakjp/css-color@4.0.5':
     dependencies:
@@ -1821,19 +1714,10 @@ snapshots:
   '@esbuild/win32-x64@0.25.12':
     optional: true
 
-  '@libsql/client-wasm@0.15.15':
+  '@myhi2025/shared@1.0.6(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)':
     dependencies:
-      '@libsql/core': 0.15.15
-      js-base64: 3.7.8
-
-  '@libsql/core@0.15.15':
-    dependencies:
-      js-base64: 3.7.8
-
-  '@myhi2025/shared@1.0.1(@libsql/client-wasm@0.15.15)(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)':
-    dependencies:
-      drizzle-orm: 0.35.3(@libsql/client-wasm@0.15.15)(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)
-      drizzle-zod: 0.5.1(drizzle-orm@0.35.3(@libsql/client-wasm@0.15.15)(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3))(zod@3.25.76)
+      drizzle-orm: 0.39.3(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)
+      drizzle-zod: 0.7.1(drizzle-orm@0.39.3(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3))(zod@3.25.76)
       zod: 3.25.76
     transitivePeerDependencies:
       - '@aws-sdk/client-rds-data'
@@ -1849,7 +1733,6 @@ snapshots:
       - '@tidbcloud/serverless'
       - '@types/better-sqlite3'
       - '@types/pg'
-      - '@types/react'
       - '@types/sql.js'
       - '@vercel/postgres'
       - '@xata.io/client'
@@ -1862,7 +1745,6 @@ snapshots:
       - pg
       - postgres
       - prisma
-      - react
       - sql.js
       - sqlite3
 
@@ -2154,29 +2036,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.35.3(@libsql/client-wasm@0.15.15)(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3):
-    dependencies:
-      '@libsql/client-wasm': 0.15.15
+  drizzle-orm@0.39.3(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3):
     optionalDependencies:
       '@neondatabase/serverless': 0.10.4
       '@types/pg': 8.15.6
       pg: 8.16.3
 
-  drizzle-orm@0.39.3(@libsql/client-wasm@0.15.15)(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3):
-    optionalDependencies:
-      '@libsql/client-wasm': 0.15.15
-      '@neondatabase/serverless': 0.10.4
-      '@types/pg': 8.15.6
-      pg: 8.16.3
-
-  drizzle-zod@0.5.1(drizzle-orm@0.35.3(@libsql/client-wasm@0.15.15)(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3))(zod@3.25.76):
+  drizzle-zod@0.7.1(drizzle-orm@0.39.3(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3))(zod@3.25.76):
     dependencies:
-      drizzle-orm: 0.35.3(@libsql/client-wasm@0.15.15)(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)
-      zod: 3.25.76
-
-  drizzle-zod@0.7.1(drizzle-orm@0.39.3(@libsql/client-wasm@0.15.15)(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3))(zod@3.25.76):
-    dependencies:
-      drizzle-orm: 0.39.3(@libsql/client-wasm@0.15.15)(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)
+      drizzle-orm: 0.39.3(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)
       zod: 3.25.76
 
   dunder-proto@1.0.1:
@@ -2446,11 +2314,9 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  js-base64@3.7.8: {}
-
   jsdom@27.1.0(bufferutil@4.0.9):
     dependencies:
-      '@acemir/cssom': 0.9.19
+      '@acemir/cssom': 0.9.20
       '@asamuzakjp/dom-selector': 6.7.4
       cssstyle: 5.3.2
       data-urls: 6.0.0
