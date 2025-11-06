@@ -39,22 +39,22 @@ export class TeamRepositoryImpl implements ITeamRepository {
       .insert(teamMembers)
       .values({
         id,
-        title: data.title ?? null,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        role: data.role,
-        bio: data.bio ?? null,
-        photoUrl: data.photoUrl ?? null,
-        photoAlt: data.photoAlt ?? null,
-        linkedin: data.linkedin ?? null,
-        achievements: data.achievements || [],
-        displayOrder: data.displayOrder ?? 0,
-        isVisible: data.isVisible ?? true,
+        title: data.title as string ?? null,
+        firstName: data.firstName as string,
+        lastName: data.lastName as string,
+        role: data.role as string,
+        bio: data.bio as string ?? null,
+        photoUrl: data.photoUrl as string ?? null,
+        photoAlt: data.photoAlt as string ?? null,
+        linkedin: data.linkedin as string ?? null,
+        achievements: data.achievements as string || [],
+        displayOrder: data.displayOrder as number ?? 0,
+        isVisible: data.isVisible as boolean ?? true,
         createdAt: now,
         updatedAt: now,
         createdBy: null,
         updatedBy: null,
-      })
+      } satisfies typeof teamMembers.$inferInsert)
       .returning();
 
     return member;
