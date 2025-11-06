@@ -103,12 +103,12 @@ export class UsersRepositoryImpl implements IUsersRepository {
   }
 
   async createUser(data: InsertUser): Promise<User> {
-    const existingByUsername = await this.findUserByUsername(data.username);
+    const existingByUsername = await this.findUserByUsername(data.username as string);
     if (existingByUsername) {
       throw new DuplicateError("User", "username");
     }
 
-    const existingByEmail = await this.findUserByEmail(data.email);
+    const existingByEmail = await this.findUserByEmail(data.email as string);
     if (existingByEmail) {
       throw new DuplicateError("User", "email");
     }
@@ -116,10 +116,10 @@ export class UsersRepositoryImpl implements IUsersRepository {
     const id = randomUUID();
     const now = new Date();
     const user: User = {
-      ...data,
+      ...data as User,
       id,
-      firstName: data.firstName || null,
-      lastName: data.lastName || null,
+      firstName: data.firstName as string || null,
+      lastName: data.lastNam as string || null,
       isActive: true,
       lastLoginAt: null,
       createdAt: now,
@@ -175,16 +175,16 @@ export class UsersRepositoryImpl implements IUsersRepository {
   }
 
   async createRole(data: InsertRole): Promise<Role> {
-    const existing = await this.findRoleByName(data.name);
+    const existing = await this.findRoleByName(data.name as string);
     if (existing) {
       throw new DuplicateError("Role", "name");
     }
 
     const id = randomUUID();
     const role: Role = {
-      ...data,
+      ...data as Role,
       id,
-      description: data.description || null,
+      description: data.description as string || null,
       permissions: data.permissions || [],
       createdAt: new Date(),
     };
