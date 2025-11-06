@@ -464,7 +464,10 @@ export class DbStorage implements IStorage {
   }
 
   async createPage(page: InsertPage): Promise<Page> {
-    const result = await db.insert(pagesTable).values(page as any).returning();
+    const result = await db
+      .insert(pagesTable)
+      .values(page as any)
+      .returning();
     return result[0];
   }
 
@@ -665,13 +668,26 @@ export class DbStorage implements IStorage {
   async createMediaPosition(
     position: InsertMediaPosition
   ): Promise<MediaPosition> {
-    const result = await db
+    const validPosition: typeof mediaPositionsTable.$inferInsert = {
+      positionKey: position.positionKey as string,
+      label: position.label as string,
+      category: position.category as string,
+      description: (position.description as string) ?? null,
+      mediaUrl: (position.mediaUrl as string) ?? null,
+      mediaAlt: (position.mediaAlt as string) ?? null,
+      mediaAssetId: (position.mediaAssetId as string) ?? null,
+      isActive: (position.isActive as boolean) ?? false,
+      displayOrder: (position.displayOrder as number) ?? 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      updatedBy: position.updatedBy ?? null,
+    };
+
+    const [result] = await db
       .insert(mediaPositionsTable)
-      .values(
-        position as any
-      )
+      .values(validPosition)
       .returning();
-    return result[0];
+    return result;
   }
 
   async updateMediaPosition(
@@ -762,10 +778,10 @@ export class DbStorage implements IStorage {
   async upsertSetting(setting: InsertSystemSetting): Promise<SystemSetting> {
     const result = await db
       .insert(systemSettingsTable)
-      .values({ ...setting as any, updatedAt: new Date() })
+      .values({ ...(setting as any), updatedAt: new Date() })
       .onConflictDoUpdate({
         target: systemSettingsTable.key,
-        set: { ...setting as any, updatedAt: new Date() },
+        set: { ...(setting as any), updatedAt: new Date() },
       })
       .returning();
     return result[0];
@@ -804,7 +820,10 @@ export class DbStorage implements IStorage {
   }
 
   async createVideo(video: InsertVideoContent): Promise<VideoContent> {
-    const result = await db.insert(videoContentTable).values(video as any).returning();
+    const result = await db
+      .insert(videoContentTable)
+      .values(video as any)
+      .returning();
     return result[0];
   }
 

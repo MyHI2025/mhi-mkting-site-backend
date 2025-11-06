@@ -117,7 +117,7 @@ router.put(
 
       const updatedPosition = await mediaPositionsService.updateMediaPosition(
         id,
-        validatedData,
+        validatedData as any,
         currentUser.id,
         req
       );
