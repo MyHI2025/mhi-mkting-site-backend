@@ -44,7 +44,7 @@ export class MediaRepositoryImpl implements IMediaRepository {
   }
 
   async createMediaPosition(data: InsertMediaPosition): Promise<MediaPosition> {
-    const existing = await this.findMediaPositionByKey(data.positionKey);
+    const existing = await this.findMediaPositionByKey(data.positionKey as string);
     if (existing) {
       throw new DuplicateError("MediaPosition", "positionKey");
     }
@@ -52,16 +52,16 @@ export class MediaRepositoryImpl implements IMediaRepository {
     const id = randomUUID();
     const now = new Date();
     const newPosition: MediaPosition = {
-      positionKey: data.positionKey,
-      label: data.label,
-      category: data.category,
+      positionKey: data.positionKey as string,
+      label: data.label as string,
+      category: data.category as string || "general",
       id,
-      description: data.description ?? null,
-      mediaUrl: data.mediaUrl ?? null,
-      mediaAlt: data.mediaAlt ?? null,
-      mediaAssetId: data.mediaAssetId ?? null,
-      isActive: data.isActive ?? true,
-      displayOrder: data.displayOrder ?? 0,
+      description: data.description as string ?? null,
+      mediaUrl: data.mediaUrl as string ?? null,
+      mediaAlt: data.mediaAlt as string ?? null,
+      mediaAssetId: data.mediaAssetId as string ?? null,
+      isActive: data.isActive as boolean ?? true,
+      displayOrder: data.displayOrder as number ?? 0,
       createdAt: now,
       updatedAt: now,
       updatedBy: null,
@@ -121,15 +121,15 @@ export class MediaRepositoryImpl implements IMediaRepository {
     const id = randomUUID();
     const now = new Date();
     const newVideo: VideoContent = {
-      ...data,
+      ...data as VideoContent,
       id,
-      description: data.description ?? null,
-      thumbnailUrl: data.thumbnailUrl ?? null,
-      duration: data.duration ?? null,
-      category: data.category ?? "Webinar",
-      isPublished: data.isPublished ?? false,
-      views: data.views ?? 0,
-      displayOrder: data.displayOrder ?? 0,
+      description: data.description as string ?? null,
+      thumbnailUrl: data.thumbnailUrl as string ?? null,
+      duration: data.duration as string ?? null,
+      category: data.category as string ?? "Webinar",
+      isPublished: data.isPublished as boolean ?? false,
+      views: data.views as number ?? 0,
+      displayOrder: data.displayOrder as number ?? 0,
       createdAt: now,
       updatedAt: now,
       createdBy: null,
