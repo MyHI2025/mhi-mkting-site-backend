@@ -39,12 +39,12 @@ export class NavigationRepositoryImpl implements INavigationRepository {
   ): Promise<NavigationItem> {
     const id = randomUUID();
     const item: NavigationItem = {
-      ...data,
+      ...data as NavigationItem,
       id,
-      href: data.href || null,
-      target: data.target || "_self",
-      displayOrder: data.displayOrder || 0,
-      parentId: data.parentId || null,
+      href: data.href as string || null,
+      target: data.target as string || "_self",
+      displayOrder: data.displayOrder as number || 0,
+      parentId: data.parentId as string || null,
       isVisible: true,
       createdAt: new Date(),
     };
