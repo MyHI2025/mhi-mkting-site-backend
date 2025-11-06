@@ -54,7 +54,17 @@ export class VideosService {
     req: Request
   ) {
     const updatedVideo = await mediaRepository.updateVideo(id, {
-      ...data,
+      ...(data as {
+        description: string;
+        title: string;
+        category: string;
+        isPublished: boolean;
+        displayOrder: number;
+        youtubeUrl: string;
+        thumbnailUrl: string;
+        duration: string;
+        views: number;
+      }),
       updatedBy: currentUserId,
     });
 
