@@ -63,7 +63,7 @@ export class ContentRepositoryImpl implements IContentRepository {
   }
 
   async createPage(data: InsertPage): Promise<Page> {
-    const existing = await this.findPageBySlug(data.slug);
+    const existing = await this.findPageBySlug(data.slug as string);
     if (existing) {
       throw new DuplicateError("Page", "slug");
     }
@@ -75,23 +75,23 @@ export class ContentRepositoryImpl implements IContentRepository {
       .insert(pages)
       .values({
         id,
-        slug: data.slug,
-        title: data.title,
-        description: data.description || null,
-        pageType: data.pageType || "marketing",
-        category: data.category || null,
-        metaTitle: data.metaTitle || null,
-        metaDescription: data.metaDescription || null,
-        featuredImage: data.featuredImage || null,
+        slug: data.slug as string,
+        title: data.title as string,
+        description: data.description as string || null,
+        pageType: data.pageType as string || "marketing",
+        category: data.category as string || null,
+        metaTitle: data.metaTitle as string || null,
+        metaDescription: data.metaDescription as string || null,
+        featuredImage: data.featuredImage as string || null,
         author: null,
-        isPublished: data.isPublished ?? false,
+        isPublished: data.isPublished as boolean ?? false,
         publishedAt: null,
         metadata: data.metadata || null,
         createdAt: now,
         updatedAt: now,
         createdBy: null,
         updatedBy: null,
-      })
+      } satisfies typeof pages.$inferInsert)
       .returning();
 
     // Create initial version
@@ -228,16 +228,16 @@ export class ContentRepositoryImpl implements IContentRepository {
       .insert(contentNodes)
       .values({
         id,
-        pageId: data.pageId,
-        nodeType: data.nodeType,
-        content: data.content || {},
-        displayOrder: data.displayOrder || null,
-        parentId: data.parentId || null,
+        pageId: data.pageId as string,
+        nodeType: data.nodeType as string,
+        content: data.content as string || {},
+        displayOrder: data.displayOrder as number || null,
+        parentId: data.parentId as string || null,
         styles: data.styles || {},
         isVisible: true,
         createdAt: now,
         updatedAt: now,
-      })
+      } satisfies typeof contentNodes.$inferInsert)
       .returning();
 
     return node;
@@ -302,16 +302,16 @@ export class ContentRepositoryImpl implements IContentRepository {
       .insert(contentSections)
       .values({
         id,
-        pageId: data.pageId,
-        sectionType: data.sectionType,
-        title: data.title || null,
-        subtitle: data.subtitle || null,
-        content: data.content || {},
-        displayOrder: data.displayOrder || null,
+        pageId: data.pageId as string,
+        sectionType: data.sectionType as string,
+        title: data.title as string || null,
+        subtitle: data.subtitle as string || null,
+        content: data.content as string || {},
+        displayOrder: data.displayOrder as number || null,
         isVisible: true,
         createdAt: now,
         updatedAt: now,
-      })
+      } satisfies typeof contentSections.$inferInsert)
       .returning();
 
     return section;
@@ -378,15 +378,15 @@ export class ContentRepositoryImpl implements IContentRepository {
       .insert(contentBlocks)
       .values({
         id,
-        sectionId: data.sectionId,
-        blockType: data.blockType,
-        title: data.title || null,
-        content: data.content || {},
-        displayOrder: data.displayOrder || null,
+        sectionId: data.sectionId as string,
+        blockType: data.blockType as string,
+        title: data.title as string || null,
+        content: data.content as string || {},
+        displayOrder: data.displayOrder as number || null,
         isVisible: true,
         createdAt: now,
         updatedAt: now,
-      })
+      } satisfies typeof contentBlocks.$inferInsert)
       .returning();
 
     return block;
@@ -442,7 +442,7 @@ export class ContentRepositoryImpl implements IContentRepository {
   }
 
   async createContact(data: InsertContact): Promise<Contact> {
-    const [contact] = await db.insert(contacts).values(data).returning();
+    const [contact] = await db.insert(contacts).values(data as any).returning();
     return contact;
   }
 
@@ -520,22 +520,22 @@ export class ContentRepositoryImpl implements IContentRepository {
       .insert(pageVersions)
       .values({
         id,
-        pageId: data.pageId,
-        versionNumber: data.versionNumber,
-        title: data.title,
-        description: data.description || null,
-        pageType: data.pageType,
-        category: data.category || null,
-        metaTitle: data.metaTitle || null,
-        metaDescription: data.metaDescription || null,
-        featuredImage: data.featuredImage || null,
-        metadata: data.metadata || null,
-        isPublished: data.isPublished || false,
-        changeType: data.changeType,
-        changeSummary: data.changeSummary || null,
+        pageId: data.pageId as string,
+        versionNumber: data.versionNumber as number,
+        title: data.title as string,
+        description: data.description as string  || null,
+        pageType: data.pageType as string,
+        category: data.category as string || null,
+        metaTitle: data.metaTitle as string || null,
+        metaDescription: data.metaDescription as string || null,
+        featuredImage: data.featuredImage as string || null,
+        metadata: data.metadata as string || null,
+        isPublished: data.isPublished as boolean || false,
+        changeType: data.changeType as string,
+        changeSummary: data.changeSummary as string || null,
         createdAt: now,
         createdBy: createdBy || null,
-      })
+      } satisfies typeof pageVersions.$inferInsert)
       .returning();
 
     return version;
