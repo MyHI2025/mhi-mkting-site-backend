@@ -464,7 +464,7 @@ export class DbStorage implements IStorage {
   }
 
   async createPage(page: InsertPage): Promise<Page> {
-    const result = await db.insert(pagesTable).values(page).returning();
+    const result = await db.insert(pagesTable).values(page as any).returning();
     return result[0];
   }
 
@@ -804,7 +804,7 @@ export class DbStorage implements IStorage {
   }
 
   async createVideo(video: InsertVideoContent): Promise<VideoContent> {
-    const result = await db.insert(videoContentTable).values(video).returning();
+    const result = await db.insert(videoContentTable).values(video as any).returning();
     return result[0];
   }
 
