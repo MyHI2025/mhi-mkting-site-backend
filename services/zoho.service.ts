@@ -151,7 +151,7 @@ export class ZohoCRMService {
         }),
       });
 
-      const result = await response.json();
+      const result = await response.json() as any;
 
       if (!response.ok) {
         console.error("Zoho API error:", result);

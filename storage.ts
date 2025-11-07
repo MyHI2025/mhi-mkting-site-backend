@@ -54,6 +54,7 @@ export interface IStorage {
   deleteRole(id: string): Promise<boolean>;
   getAllRoles(): Promise<Role[]>;
   getUserRoles(userId: string): Promise<UserRole[]>;
+  getAUserRole(userId: string): Promise<Role[]>;
   assignUserRole(userId: string, roleId: string): Promise<UserRole>;
   removeUserRole(userId: string, roleId: string): Promise<boolean>;
 
@@ -356,6 +357,20 @@ export class DbStorage implements IStorage {
     return db
       .select()
       .from(userRolesTable)
+      .where(eq(userRolesTable.userId, userId));
+  }
+
+  async getAUserRole(userId: string): Promise<Role[]> {
+    return db
+      .select({
+      id: rolesTable.id,
+      name: rolesTable.name,
+      description: rolesTable.description,
+      permissions: rolesTable.permissions,
+      createdAt: rolesTable.createdAt,
+    })
+      .from(userRolesTable)
+      .innerJoin(rolesTable, eq(userRolesTable.roleId, rolesTable.id))
       .where(eq(userRolesTable.userId, userId));
   }
 
@@ -1285,6 +1300,14 @@ export class MemStorage implements IStorage {
   async getUserRoles(userId: string): Promise<UserRole[]> {
     return Array.from(this.userRoles.values()).filter(
       (ur) => ur.userId === userId
+    );
+  }
+  async getAUserRole(userId: string): Promise<Role[]> {
+    const userRoleIds = Array.from(this.userRoles.values())
+      .filter((ur) => ur.userId === userId)
+      .map((ur) => ur.roleId);
+    return Array.from(this.roles.values()).filter((role) =>
+      userRoleIds.includes(role.id)
     );
   }
 

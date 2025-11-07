@@ -18,9 +18,9 @@ import {
   navigationItems, 
   mediaPositions, 
   teamMembers,
-  videos,
+  videoContent,
   contacts
-} from '@shared/schema';
+} from '@myhi2025/shared';
 import { sql } from 'drizzle-orm';
 
 async function checkAndFixDatabase() {
@@ -32,7 +32,7 @@ async function checkAndFixDatabase() {
     const [navResult] = await db.select({ count: sql<number>`count(*)` }).from(navigationItems);
     const [mediaResult] = await db.select({ count: sql<number>`count(*)` }).from(mediaPositions);
     const [teamResult] = await db.select({ count: sql<number>`count(*)` }).from(teamMembers);
-    const [videosResult] = await db.select({ count: sql<number>`count(*)` }).from(videos);
+    const [videosResult] = await db.select({ count: sql<number>`count(*)` }).from(videoContent);
     const [contactsResult] = await db.select({ count: sql<number>`count(*)` }).from(contacts);
     
     const pagesCount = Number(pagesResult.count);

@@ -297,7 +297,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "themes",
         id,
         {
-          theme_name: updatedTheme.name,
+          theme_name: updatedTheme?.name,
         },
         req
       );
@@ -338,7 +338,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "themes",
         id,
         {
-          theme_name: activatedTheme.name,
+          theme_name: activatedTheme?.name,
         },
         req
       );
