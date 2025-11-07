@@ -14,10 +14,11 @@
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
    // "isolatedModules": true
+    "paths": {
+    "@myhi2025/shared": ["./node_modules/@myhi2025/shared"]
+    }
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"],
-  "paths": {
-    "@myhi2025/shared": ["./node_modules/@myhi2025/shared"]
-  }
+  
 }
