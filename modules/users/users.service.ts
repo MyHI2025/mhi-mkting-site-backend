@@ -33,7 +33,7 @@ export class UsersService {
     currentUserId: string,
     req: Request
   ) {
-    const passwordValidation = validatePasswordStrength(data.password);
+    const passwordValidation = validatePasswordStrength(data.password as string);
     if (!passwordValidation.isValid) {
       throw {
         status: 400,
@@ -43,18 +43,18 @@ export class UsersService {
     }
 
     const existingUserByUsername = await storage.getUserByUsername(
-      data.username
+      data.username as string
     );
     if (existingUserByUsername) {
       throw { status: 400, message: "Username already exists" };
     }
 
-    const existingUserByEmail = await storage.getUserByEmail(data.email);
+    const existingUserByEmail = await storage.getUserByEmail(data.email as string);
     if (existingUserByEmail) {
       throw { status: 400, message: "Email already exists" };
     }
 
-    const hashedPassword = await hashPassword(data.password);
+    const hashedPassword = await hashPassword(data.password as string);
 
     const newUser = await storage.createUser({
       ...data,
@@ -83,7 +83,7 @@ export class UsersService {
     currentUserId: string,
     req: Request
   ) {
-    const existingRole = await storage.getRoleByName(data.name);
+    const existingRole = await storage.getRoleByName(data.name as string);
     if (existingRole) {
       throw { status: 400, message: "Role name already exists" };
     }

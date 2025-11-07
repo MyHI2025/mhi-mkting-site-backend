@@ -1,7 +1,7 @@
 import { teamRepository } from "../../repositories/implementations";
 import { logUserAction } from "../../auth";
 import { Request } from "express";
-import type { InsertTeamMember } from "@myhi2025/shared";
+import type { InsertTeamMember, TeamMember } from "@myhi2025/shared";
 import { notFound } from "../common/errorHandlers";
 
 export class TeamService {
@@ -52,7 +52,7 @@ export class TeamService {
     currentUserId: string,
     req: Request
   ) {
-    const updatedMember = await teamRepository.updateTeamMember(id, data);
+    const updatedMember = await teamRepository.updateTeamMember(id, data as Partial<TeamMember>);
 
     const memberName = `${
       updatedMember.title ? updatedMember.title + " " : ""

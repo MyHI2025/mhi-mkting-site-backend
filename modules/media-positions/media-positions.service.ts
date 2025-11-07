@@ -8,7 +8,8 @@ export const mediaPositionsService = {
   },
 
   async getActiveMediaPositions(): Promise<MediaPosition[]> {
-    return await storage.getPublicMediaPositions();
+    const position = await storage.getMediaPositionByKey("active");
+    return position ? [position] : [];
   },
 
   async getMediaPositionsByCategory(
@@ -55,24 +56,24 @@ export const mediaPositionsService = {
     updates: Partial<MediaPosition>,
     userId: string,
     req: any
-  ): Promise<MediaPosition> {
+  ): Promise<MediaPosition | null> {
     const position = await storage.updateMediaPosition(id, updates);
 
     await storage.createAuditLog({
       userId,
       action: "update",
       resource: "media_positions",
-      resourceId: position.id,
+      resourceId: position?.id || null,
       details: {
         message: "Media position updated",
-        positionKey: position.positionKey,
+        positionKey: position?.positionKey,
         updates,
       },
       ipAddress: req.ip || "127.0.0.1",
       userAgent: req.get("User-Agent") || "Unknown",
     });
 
-    return position;
+    return position || null;
   },
 
   async deleteMediaPosition(

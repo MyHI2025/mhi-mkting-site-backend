@@ -46,7 +46,7 @@ export class CmsService {
     currentUserId: string,
     req: Request
   ) {
-    const existingPage = await contentRepository.findPageBySlug(data.slug);
+    const existingPage = await contentRepository.findPageBySlug(data.slug as string);
     if (existingPage) {
       throw conflict("Page with this slug already exists");
     }

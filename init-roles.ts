@@ -15,7 +15,7 @@ const existingAdminRole = await storage.getRoleByName("Admin");
       // Check if admin user has the role
       const adminUser = await storage.getUserByUsername("admin");
       if (adminUser) {
-        const userRoles = await storage.getUserRoles(adminUser.id);
+        const userRoles = await storage.getAUserRole(adminUser.id);
         if (!userRoles.find(r => r.name === "Admin")) {
           console.log("   ⚠️  Admin user doesn't have Admin role, assigning now...");
           await storage.assignUserRole(adminUser.id, existingAdminRole.id);

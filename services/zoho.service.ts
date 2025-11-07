@@ -91,7 +91,7 @@ export class ZohoCRMService {
         throw new Error(`Failed to refresh Zoho token: ${error}`);
       }
 
-      const data: ZohoTokenResponse = await response.json();
+      const data = await response.json() as ZohoTokenResponse;
       this.accessToken = data.access_token;
       this.tokenExpiry = Date.now() + data.expires_in * 1000;
 
@@ -151,7 +151,7 @@ export class ZohoCRMService {
         }),
       });
 
-      const result = await response.json();
+      const result = await response.json() as any;
 
       if (!response.ok) {
         console.error("Zoho API error:", result);
