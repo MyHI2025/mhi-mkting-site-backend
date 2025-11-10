@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon --watch . --ext ts,tsx --exec tsx index.ts",
-    "build": "npm run typecheck && esbuild index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "build": "npm run typecheck && esbuild index.ts --platform=node --packages=external --bundle --format=cjs --outdir=dist",
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "db:push": "drizzle-kit push",
     "typecheck": "tsc --noEmit"
