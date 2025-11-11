@@ -7,11 +7,11 @@
     "node": "20.x"
   },
   "scripts": {
-    "dev": "cross-env NODE_ENV=development nodemon --watch . --ext ts,tsx --exec tsx src/index.ts",
-    "build": "npm run typecheck && esbuild src/**/*.ts --platform=node --format=esm --outdir=dist",
-    "start": "cross-env NODE_ENV=production node dist/index.js",
-    "db:push": "drizzle-kit push",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:esbuild": "esbuild \"src/**/*.ts\" --outdir=dist --platform=node --format=esm --packages=external",
+    "postbuild:fix": "node ./scripts/index.mjs",
+    "build": "npm run typecheck && npm run build:esbuild && npm run postbuild:fix",
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "@myhi2025/shared": "^1.0.8",
