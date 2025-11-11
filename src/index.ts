@@ -1,5 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
+import { registerRoutes } from "./routes/index.route";
 import { initializeAdmin } from "./init-admin";
 import dotenv from "dotenv";
 import cors from "cors";
