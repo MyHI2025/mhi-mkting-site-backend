@@ -625,7 +625,7 @@ export class DbStorage implements IStorage {
         lastName: member.lastName as string,
         title: member.title as string,
         displayOrder: Number(member.displayOrder),
-        isVisible: member.isVisible === "true",
+        isVisible: member.isVisible as boolean,
         role: member.role as string,
         bio: member.bio as string,
         photoUrl: member.photoUrl as string,
@@ -695,7 +695,7 @@ export class DbStorage implements IStorage {
       displayOrder: (position.displayOrder as number) ?? 0,
       createdAt: new Date(),
       updatedAt: new Date(),
-      updatedBy: position.updatedBy ?? null,
+      // updatedBy: position.updatedBy ?? null,
     };
 
     const [result] = await db

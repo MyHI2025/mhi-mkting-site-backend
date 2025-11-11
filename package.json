@@ -7,14 +7,14 @@
     "node": "20.x"
   },
   "scripts": {
-    "dev": "cross-env NODE_ENV=development nodemon --watch . --ext ts,tsx --exec tsx index.ts",
-    "build": "npm run typecheck && esbuild index.ts --platform=node --packages=external --bundle --format=cjs --outdir=dist",
+    "dev": "cross-env NODE_ENV=development nodemon --watch . --ext ts,tsx --exec tsx src/index.ts",
+    "build": "npm run typecheck && esbuild src/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "db:push": "drizzle-kit push",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@myhi2025/shared": "^1.0.6",
+    "@myhi2025/shared": "^1.0.8",
     "@neondatabase/serverless": "^0.10.4",
     "bcryptjs": "^3.0.2",
     "connect-pg-simple": "^10.0.0",
