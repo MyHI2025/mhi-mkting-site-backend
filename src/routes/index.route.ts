@@ -7,26 +7,26 @@ import {
   insertThemeSettingsSchema,
   insertSystemSettingSchema,
 } from "@myhi2025/shared";
-import { authenticateToken, requirePermission, logUserAction } from "./auth";
-import { uploadDirectory } from "./modules/media/media.config";
+import { authenticateToken, requirePermission, logUserAction } from "../auth";
+import { uploadDirectory } from "../modules/media/media.config";
 import {
   asyncHandler,
   sendErrorResponse,
-} from "./modules/common/errorHandlers";
-import { storage } from "./storage";
+} from "../modules/common/errorHandlers";
+import { storage } from "../storage";
 
-import authRouter from "./modules/auth";
-import usersRouter from "./modules/users";
-import { cmsPublicRouter, cmsAdminRouter } from "./modules/cms";
-import mediaRouter from "./modules/media";
-import navigationRouter from "./modules/navigation";
-import { teamPublicRouter, teamAdminRouter } from "./modules/team";
+import authRouter from "../modules/auth";
+import usersRouter from "../modules/users";
+import { cmsPublicRouter, cmsAdminRouter } from "../modules/cms";
+import mediaRouter from "../modules/media";
+import navigationRouter from "../modules/navigation";
+import { teamPublicRouter, teamAdminRouter } from "../modules/team";
 import {
   mediaPositionsPublicRouter,
   mediaPositionsAdminRouter,
-} from "./modules/media-positions";
-import { videosPublicRouter, videosAdminRouter } from "./modules/videos";
-import dashboardAdminRouter from "./modules/dashboard/dashboard.admin.routes";
+} from "../modules/media-positions";
+import { videosPublicRouter, videosAdminRouter } from "../modules/videos";
+import dashboardAdminRouter from "../modules/dashboard/dashboard.admin.routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.use(
@@ -75,7 +75,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const contact = await storage.createContact(validatedData);
 
       // Sync to Zoho CRM asynchronously (don't block the response)
-      import("./services/zoho.service").then(({ zohoCRM }) => {
+      import("../services/zoho.service").then(({ zohoCRM }) => {
         zohoCRM
           .createLead(contact)
           .then((result) => {
@@ -116,7 +116,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     authenticateToken,
     requirePermission("content", "update"),
     asyncHandler(async (req, res) => {
-      const { zohoCRM } = await import("./services/zoho.service");
+      const { zohoCRM } = await import("../services/zoho.service");
 
       if (!zohoCRM.isConfigured()) {
         return res.status(400).json({
