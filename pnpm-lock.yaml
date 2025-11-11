@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@myhi2025/shared':
-        specifier: ^1.0.6
-        version: 1.0.6(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)
+        specifier: ^1.0.8
+        version: 1.0.8(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)
       '@neondatabase/serverless':
         specifier: ^0.10.4
         version: 0.10.4
@@ -479,8 +479,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@myhi2025/shared@1.0.6':
-    resolution: {integrity: sha512-pikU77YVINhFm54zxahOM+s2scthZG4p5N/gQOnikH1vejHC6XsLuqkoCSNgC6vJL4T+Y5SnFFVm7rIK8DbroA==, tarball: https://npm.pkg.github.com/download/@myhi2025/shared/1.0.6/ea8382549d2794eaee44a65cea3a6f0d68282811}
+  '@myhi2025/shared@1.0.8':
+    resolution: {integrity: sha512-LXn80emf18+64ta4tIulXpPsLsVzVG82GbBZGj2egAXCU3YaEeWatUsUAep/xroIQdyCLk7a7I4oXd9F9Fq2sg==, tarball: https://npm.pkg.github.com/download/@myhi2025/shared/1.0.8/3dddcec540ffa98534575bced4220275a3d38b02}
 
   '@neondatabase/serverless@0.10.4':
     resolution: {integrity: sha512-2nZuh3VUO9voBauuh+IGYRhGU/MskWHt1IuZvHcJw6GLjDgtqj/KViKo7SIrLdGLdot7vFbiRRw+BgEy3wT9HA==}
@@ -1714,7 +1714,7 @@ snapshots:
   '@esbuild/win32-x64@0.25.12':
     optional: true
 
-  '@myhi2025/shared@1.0.6(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)':
+  '@myhi2025/shared@1.0.8(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)':
     dependencies:
       drizzle-orm: 0.39.3(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3)
       drizzle-zod: 0.7.1(drizzle-orm@0.39.3(@neondatabase/serverless@0.10.4)(@types/pg@8.15.6)(pg@8.16.3))(zod@3.25.76)

@@ -119,7 +119,7 @@ export class UsersRepositoryImpl implements IUsersRepository {
       ...data as User,
       id,
       firstName: data.firstName as string || null,
-      lastName: data.lastNam as string || null,
+      lastName: data.lastName as string || null,
       isActive: true,
       lastLoginAt: null,
       createdAt: now,

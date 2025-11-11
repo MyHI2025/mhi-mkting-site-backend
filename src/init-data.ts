@@ -291,7 +291,9 @@ async function initializeDefaultTeamMembers(adminUserId: string) {
     ];
 
     for (const member of teamMembers) {
-      await storage.createTeamMember(member);
+      const [firstName, ...rest] = member.name.split(" ");
+      const lastName = rest.join(" ");
+      await storage.createTeamMember({...member, firstName, lastName });
       console.log(`   ✓ Created: ${member.name}`);
     }
 

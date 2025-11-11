@@ -28,8 +28,8 @@ export class VideosService {
   ) {
     const newVideo = await mediaRepository.createVideo({
       ...data,
-      createdBy: currentUserId,
-      updatedBy: currentUserId,
+      // createdBy: currentUserId,
+      // updatedBy: currentUserId,
     });
 
     await logUserAction(
