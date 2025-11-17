@@ -6,31 +6,29 @@ import { upload } from './media.config';
 
 const router = Router();
 
-router.get("/", authenticateToken, requirePermission("media", "read"), async (req, res) => {
+router.get("/", authenticateToken, requirePermission("media", "read"), async (req, res, next) => {
   try {
     const { search } = req.query;
     const mediaAssets = await mediaService.getAllMedia(search as string);
     res.json(mediaAssets);
   } catch (error) {
     console.error("Get media error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
   }
 });
 
-router.get("/:id", authenticateToken, requirePermission("media", "read"), async (req, res) => {
+router.get("/:id", authenticateToken, requirePermission("media", "read"), async (req, res, next) => {
   try {
     const { id } = req.params;
     const asset = await mediaService.getMediaAsset(id);
     res.json(asset);
   } catch (error: any) {
     console.error("Get media asset error:", error);
-    const status = error.status || 500;
-    const message = error.message || "Internal server error";
-    res.status(status).json({ error: message });
+    next(error);
   }
 });
 
-router.post("/", authenticateToken, requirePermission("media", "create"), upload.single('file'), async (req, res) => {
+router.post("/", authenticateToken, requirePermission("media", "create"), upload.single('file'), async (req, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -52,11 +50,12 @@ router.post("/", authenticateToken, requirePermission("media", "create"), upload
     }
     
     console.error("Create media asset error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    next(error);
+    // res.status(500).json({ error: "Internal server error" });
   }
 });
 
-router.put("/:id", authenticateToken, requirePermission("media", "update"), async (req, res) => {
+router.put("/:id", authenticateToken, requirePermission("media", "update"), async (req, res, next) => {
   try {
     const { id } = req.params;
     const currentUser = (req as any).user;
@@ -65,24 +64,19 @@ router.put("/:id", authenticateToken, requirePermission("media", "update"), asyn
     res.json(updatedAsset);
   } catch (error: any) {
     console.error("Update media asset error:", error);
-    const status = error.status || 500;
-    const message = error.message || "Internal server error";
-    res.status(status).json({ error: message });
+    next(error);
   }
 });
 
-router.delete("/:id", authenticateToken, requirePermission("media", "delete"), async (req, res) => {
+router.delete("/:id", authenticateToken, requirePermission("media", "delete"), async (req, res, next) => {
   try {
     const { id } = req.params;
     const currentUser = (req as any).user;
-    
     const result = await mediaService.deleteMediaAsset(id, currentUser.id, req);
     res.json(result);
   } catch (error: any) {
     console.error("Delete media asset error:", error);
-    const status = error.status || 500;
-    const message = error.message || "Internal server error";
-    res.status(status).json({ error: message });
+    next(error)
   }
 });
 

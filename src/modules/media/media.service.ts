@@ -1,8 +1,12 @@
 import { storage } from '../../storage';
 import { logUserAction } from '../../auth';
 import { Request } from 'express';
+import { cloudinaryService, ICloudinaryService } from '../../services/Cloudinary.service';
+import NotFoundError from '../../errors/NotFound';
+import InternalServerError from '../../errors/InternalServer';
 
 export class MediaService {
+  constructor(private readonly cloudinaryService?: ICloudinaryService) {}
   async getAllMedia(search?: string) {
     if (search && typeof search === 'string') {
       return await storage.searchMediaAssets(search);
@@ -13,29 +17,36 @@ export class MediaService {
   async getMediaAsset(id: string) {
     const asset = await storage.getMediaAsset(id);
     if (!asset) {
-      throw { status: 404, message: "Media asset not found" };
+      throw new NotFoundError("Media asset not found");
     }
     return asset;
   }
 
   async createMediaAsset(file: Express.Multer.File, altText: string | null, caption: string | null, currentUserId: string, req: Request) {
-    const fileUrl = `/uploads/${file.filename}`;
+    // const fileUrl = `/uploads/${file.filename}`;
+    const cloudinaryResult =  await this.cloudinaryService?.uploadFile(file.path, {
+      folder: 'media_assets',
+      use_filename: true,
+    })
+    console.log('Cloudinary upload result:', cloudinaryResult);
     
     const mediaAssetData = {
-      filename: file.filename,
+      filename: cloudinaryResult?.public_id || file.filename,
       originalName: file.originalname,
       mimeType: file.mimetype,
-      size: file.size,
-      url: fileUrl,
+      size: cloudinaryResult?.bytes || file.size,
+      url: cloudinaryResult?.secure_url || `/uploads/${file.filename}`,
       altText: altText || null,
       caption: caption || null,
+      uploadedBy: currentUserId,
+      cloudinaryPublicId: cloudinaryResult?.public_id || null,
     };
     
     const newAsset = await storage.createMediaAsset(mediaAssetData);
     
-    await storage.updateMediaAsset(newAsset.id, {
-      uploadedBy: currentUserId,
-    });
+    // await storage.updateMediaAsset(newAsset.id, {
+    //   uploadedBy: currentUserId,
+    // });
     
     await logUserAction(currentUserId, "create", "media", newAsset.id, { 
       filename: newAsset.filename,
@@ -50,7 +61,7 @@ export class MediaService {
     const updatedAsset = await storage.updateMediaAsset(id, data);
     
     if (!updatedAsset) {
-      throw { status: 404, message: "Media asset not found" };
+      throw new NotFoundError("Media asset not found");
     }
     
     await logUserAction(currentUserId, "update", "media", id, { 
@@ -61,15 +72,18 @@ export class MediaService {
   }
 
   async deleteMediaAsset(id: string, currentUserId: string, req: Request) {
+    console.log('Deleting media asset:', id);
     const asset = await storage.getMediaAsset(id);
     if (!asset) {
-      throw { status: 404, message: "Media asset not found" };
+      throw new NotFoundError("Media asset not found");
     }
+
+    await this.cloudinaryService?.deleteFile(asset?.filename || '');
     
     const deleted = await storage.deleteMediaAsset(id);
     
     if (!deleted) {
-      throw { status: 404, message: "Media asset not found" };
+      throw new InternalServerError("Failed to delete media asset");
     }
     
     await logUserAction(currentUserId, "delete", "media", id, { 
@@ -80,4 +94,4 @@ export class MediaService {
   }
 }
 
-export const mediaService = new MediaService();
+export const mediaService = new MediaService(cloudinaryService);
