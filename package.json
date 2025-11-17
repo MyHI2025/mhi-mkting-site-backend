@@ -18,6 +18,7 @@
     "@myhi2025/shared": "^1.0.8",
     "@neondatabase/serverless": "^0.10.4",
     "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.8.0",
     "connect-pg-simple": "^10.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
