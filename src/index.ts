@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes/index.route";
 import { initializeAdmin } from "./init-admin";
 import dotenv from "dotenv";
 import cors from "cors";
+import AppError from "./errors/AppError";
 
 dotenv.config();
 
@@ -64,18 +65,27 @@ app.use((req, res, next) => {
   
   const server = await registerRoutes(app);
 
-  // Global error handler
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    console.error(err);
-  });
-
   // Health check endpoint
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  app.use((_req, res) => {
+    res.status(404).json({ message: "Resource Not found" });
+  });
+
+  // Global error handler
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    let status = err.status || err.statusCode || 500;
+    let message = err.message || "Internal Server Error";
+
+    if (err instanceof AppError) {
+      status = err.statusCode;
+      message = err.message;
+    }
+    console.error("Error Handler", err);
+
+    res.status(status).json({ message });
   });
 
   const PORT = process.env.PORT || 3000;

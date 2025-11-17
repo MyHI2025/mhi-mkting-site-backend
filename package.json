@@ -11,12 +11,14 @@
     "build:esbuild": "esbuild \"src/**/*.ts\" --outdir=dist --platform=node --format=esm --packages=external",
     "postbuild:fix": "node ./scripts/index.mjs",
     "build": "npm run typecheck && npm run build:esbuild && npm run postbuild:fix",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "dev": "cross-env NODE_ENV=development tsx watch src/index.ts"
   },
   "dependencies": {
     "@myhi2025/shared": "^1.0.8",
     "@neondatabase/serverless": "^0.10.4",
     "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.8.0",
     "connect-pg-simple": "^10.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

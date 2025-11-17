@@ -1013,22 +1013,40 @@ export class DbStorage implements IStorage {
     throw new Error("Not implemented");
   }
   async getMediaAsset(id: string): Promise<MediaAsset | undefined> {
-    throw new Error("Not implemented");
+    const result = await db
+      .select()
+      .from(mediaAssetsTable)
+      .where(eq(mediaAssetsTable.id, id))
+      .limit(1);
+    return result[0];
   }
   async getAllMediaAssets(): Promise<MediaAsset[]> {
-    return [];
+    return await db.select().from(mediaAssetsTable);
   }
   async createMediaAsset(asset: InsertMediaAsset): Promise<MediaAsset> {
-    throw new Error("Not implemented");
+    // throw new Error("Not implemented");
+    const result = await db
+      .insert(mediaAssetsTable)
+      .values(
+        asset as any
+      )
+      .returning();
+    return result[0];
   }
   async updateMediaAsset(
     id: string,
     updates: Partial<MediaAsset>
   ): Promise<MediaAsset | undefined> {
-    throw new Error("Not implemented");
+    const result = await db
+      .update(mediaAssetsTable)
+      .set({ ...updates })
+      .where(eq(mediaAssetsTable.id, id))
+      .returning();
+    return result[0];
   }
   async deleteMediaAsset(id: string): Promise<boolean> {
-    throw new Error("Not implemented");
+    await db.delete(mediaAssetsTable).where(eq(mediaAssetsTable.id, id));
+    return true;
   }
   async getThemeSettings(id: string): Promise<ThemeSettings | undefined> {
     throw new Error("Not implemented");
