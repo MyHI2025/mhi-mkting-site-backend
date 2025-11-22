@@ -88,6 +88,8 @@ app.use((req, res, next) => {
     res.status(status).json({ message });
   });
 
+  // redisServiceInstance.connect();
+
   const PORT = process.env.PORT || 3000;
   server.listen(PORT, () => {
     console.log(`
