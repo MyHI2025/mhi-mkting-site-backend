@@ -9,8 +9,8 @@ export const env = {
   // Zoho CRM configuration
   zohoClientId: process.env.ZOHO_CLIENT_ID || '',
   zohoClientSecret: process.env.ZOHO_CLIENT_SECRET || '',
-  zohoRefreshToken: process.env.ZOHO_REFRESH_TOKEN || '',
   zohoDataCenter: process.env.ZOHO_DATA_CENTER || '',
+  zohoAuthorizationCode: process.env.ZOHO_AUTHORIZATION_CODE || '',
 
   // Cloudinary configuration
   cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || '',

@@ -14,6 +14,7 @@ import {
   sendErrorResponse,
 } from "../modules/common/errorHandlers";
 import { storage } from "../storage";
+import zohoRoutes from "./zoho.route"
 
 import authRouter from "../modules/auth";
 import usersRouter from "../modules/users";
@@ -77,7 +78,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Sync to Zoho CRM asynchronously (don't block the response)
       import("../services/zoho.service").then(({ zohoCRM }) => {
         zohoCRM
-          .createLead(contact)
+          .crmRequest([contact])
           .then((result) => {
             if (result.success) {
               console.log(
@@ -111,44 +112,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     })
   );
 
-  app.post(
+  app.use(
     "/api/v1/admin/contacts/sync-zoho",
     authenticateToken,
     requirePermission("content", "update"),
-    asyncHandler(async (req, res) => {
-      const { zohoCRM } = await import("../services/zoho.service");
-
-      if (!zohoCRM.isConfigured()) {
-        return res.status(400).json({
-          error: "Zoho CRM not configured. Please add credentials in Secrets.",
-        });
-      }
-
-      const contactIds = req.body.contactIds as string[] | undefined;
-      let contacts;
-
-      if (contactIds && contactIds.length > 0) {
-        // Sync specific contacts
-        const contactPromises = await Promise.all(
-          contactIds.map((id) => storage.getContactById(id))
-        );
-        contacts = contactPromises.filter(
-          (c): c is NonNullable<typeof c> => c !== null
-        );
-      } else {
-        // Sync all contacts
-        contacts = await storage.getAllContacts();
-      }
-
-      const result = await zohoCRM.createLeads(contacts);
-
-      res.json({
-        message: `Synced ${result.success} contacts successfully, ${result.failed} failed`,
-        success: result.success,
-        failed: result.failed,
-        errors: result.errors.length > 0 ? result.errors : undefined,
-      });
-    })
+    zohoRoutes
   );
 
   const auditLogsQuerySchema = z.object({
