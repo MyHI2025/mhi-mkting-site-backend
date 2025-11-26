@@ -43,7 +43,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.use("/api/v1", cmsPublicRouter);
   app.use("/api/v1", teamPublicRouter);
-  app.use("/api/v1", mediaPositionsPublicRouter);
+  app.use("/api/v1/media-positions", mediaPositionsPublicRouter);
   app.use("/api/v1", videosPublicRouter);
 
   app.use("/api/v1/admin", cmsAdminRouter);
