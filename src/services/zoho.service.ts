@@ -1,12 +1,13 @@
 import type { Contact } from "@myhi2025/shared";
 import zohoConfigInstance, { IZohoConfig } from "../config/ZohoConfig";
 
-interface ZohoTokenResponse {
+export interface ZohoTokenResponse {
   access_token: string;
   refresh_token: string;
   api_domain: string;
   token_type: string;
   expires_in: number;
+  scope: string;
 }
 
 interface ZohoLeadData {
@@ -46,7 +47,19 @@ export class ZohoCRMService {
     contacts: Contact[]
   ): Promise<{ success: boolean; id?: string; error?: string }> {
     try {
+      let token;
       const accessToken = await this.generateAccessToken();
+      if ((accessToken as {error: string}).error) {
+        const res = await this.generateAccessTokenFromRefresh();
+        console.log("Refreshed Zoho access token:", res);
+        if (res.access_token) {
+          token = res.access_token;
+          this.zohoConfig.addZohoTokens(res.access_token);
+        }
+      } else if ((accessToken as ZohoTokenResponse).access_token) {
+        token = (accessToken as ZohoTokenResponse).access_token;
+      }
+      
       const leadData: any[] = [];
       for (const contact of contacts) {
         const tempLeadData = this.mapContactToZohoLead(contact);
@@ -56,7 +69,7 @@ export class ZohoCRMService {
       const response = await fetch(`${this.zohoConfig.baseURL}/crm/v2/Leads`, {
         method: "POST",
         headers: {
-          Authorization: `Zoho-oauthtoken ${accessToken.access_token}`,
+          Authorization: `Zoho-oauthtoken ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -130,7 +143,10 @@ export class ZohoCRMService {
     );
   }
 
-  async generateAccessToken(): Promise<ZohoTokenResponse> {
+  async generateAccessToken(): Promise<ZohoTokenResponse | { error: string; }> {
+    const tokens = this.zohoConfig.getTokens();
+    if (tokens) return tokens;
+
     const params = new URLSearchParams({
       grant_type: "authorization_code",
       client_id: this.zohoConfig.getClientId(),
@@ -154,13 +170,20 @@ export class ZohoCRMService {
       throw new Error(`Failed to get access token: ${res.status} ${text}`);
     }
 
-    return JSON.parse(text);
+    const data = JSON.parse(text);
+    if (data.error) {
+      return data;
+    }
+
+    this.zohoConfig.addZohoTokens(data);
+
+    return data;
   }
 
-  async generateAccessTokenFromRefresh(refreshToken: string) {
+  async generateAccessTokenFromRefresh() {
     const params = new URLSearchParams({
       grant_type: "refresh_token",
-      refresh_token: refreshToken,
+      refresh_token: this.zohoConfig.getTokens()?.refresh_token || "",
       client_id: this.zohoConfig.getClientId(),
       client_secret: this.zohoConfig.getClientSecret(),
     });
