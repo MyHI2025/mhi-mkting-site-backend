@@ -1,3 +1,4 @@
+import { ZohoTokenResponse } from "../services/zoho.service";
 import { env } from "./env";
 
 export interface IZohoConfig {
@@ -8,9 +9,12 @@ export interface IZohoConfig {
   getRedirectUri(type: "accessToken" | "refreshToken"): string;
   getDataCenter(): string;
   getAuthorizationCode(): string;
+  addZohoTokens(data: ZohoTokenResponse): void;
+  getTokens(): ZohoTokenResponse | null;
 }
 
 export class ZohoConfig {
+  private tokens: ZohoTokenResponse | null = null;
   constructor(
     private clientId=env.zohoClientId,
     private clientSecret=env.zohoClientSecret,
@@ -44,6 +48,12 @@ export class ZohoConfig {
   }
   getAuthorizationCode() {
     return this.authorizationCode;
+  }
+  addZohoTokens(data: ZohoTokenResponse) {
+    this.tokens = data;
+  }
+  getTokens() {
+    return this.tokens;
   }
 }
 
