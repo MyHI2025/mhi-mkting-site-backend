@@ -230,8 +230,8 @@ router.patch(
 
 router.get(
   "/pages/:pageId/sections",
-  authenticateToken,
-  requirePermission("content", "read"),
+  // authenticateToken,
+  // requirePermission("content", "read"),
   asyncHandler(async (req, res) => {
     const { pageId } = req.params;
     const sections = await cmsService.getPageSections(pageId);
